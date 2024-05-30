@@ -9,7 +9,7 @@ This project aims to provide a DDAS format library which can be used in programs
 The format library consists of:
 * DAQ::DDAS::DDASHit - The DDASHit class encapsulates the information that is emitted by the Pixie-16 digitizer for a single event. It contains information for a single channel only.
 * DAQ::DDAS::DDASHitUnpacker - Unpacks DDAS data recorded by NSCLDAQ into DDASHits.
-* DDASBitMasks - Masks to extract information from specific parts of XIA Pixie list-mode data.
+* DDASBitMasks.h - A header file contianing masks used to extract information from specific parts of XIA Pixie list-mode data.
 
 ## Requirements
 

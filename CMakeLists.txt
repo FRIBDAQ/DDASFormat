@@ -45,7 +45,7 @@ enable_testing()
 
 add_executable(unpackertests
   TestRunner.cpp
-  unpackertests.cpp
+  UnpackerTests.cpp
   )
 
 target_compile_options(unpackertests PRIVATE -g -O2)

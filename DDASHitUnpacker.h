@@ -15,7 +15,7 @@ namespace DAQ {
     /** @namespace DAQ::DDAS */
     namespace DDAS {
 	/**
-	 * @addtogroup format libddasformat.so
+	 * @addtogroup format libDDASFormat.so
 	 * @{
 	 */
 	
@@ -151,14 +151,14 @@ namespace DAQ {
 	     * @brief Compute time in nanoseconds from raw data (no CFD 
 	     *   correction).
 	     * @param adcFrequency Module ADC frequency in MSPS.
-	     * @param timelow      Data word containing the lower 32 bits of 
+	     * @param timeLow      Data word containing the lower 32 bits of 
 	     *   the 48-bit timestamp.
-	     * @param timehigh     Data word containing the upper 16 bits of 
+	     * @param timeHigh     Data word containing the upper 16 bits of 
 	     *   the 48-bit timestamp. 
 	     * @return The 48-bit coarse timestamp in nanoseconds.
 	     */
 	    uint64_t computeCoarseTime(
-		uint32_t adcFrequency, uint32_t timelow, uint32_t timehigh
+		uint32_t adcFrequency, uint32_t timeLow, uint32_t timeHigh
 		);
 	    /**
 	     * @brief Unpack energy sums.

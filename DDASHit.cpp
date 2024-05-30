@@ -18,29 +18,14 @@
  * All member data are zero-initialized.
  */
 DAQ::DDAS::DDASHit::DDASHit() :
-    time(0),
-    coarsetime(0),
-    energy(0),
-    timehigh(0),
-    timelow(0),
-    timecfd(0),
-    finishcode(0),
-    channellength(0),
-    channelheaderlength(0),
-    chanid(0),
-    slotid(0),
-    crateid(0),
-    cfdtrigsourcebit(0),
-    cfdfailbit(0),
-    tracelength(0),
-    ModMSPS(0),
-    energySums(),
-    qdcSums(),
-    trace(),
-    externalTimestamp(0),
-    m_adcResolution(0),
-    m_hdwrRevision(0),
-    m_adcOverflowUnderflow(false)
+    m_time(0), m_coarseTime(0), m_externalTimestamp(0), m_energy(0),
+    m_timeHigh(0), m_timeLow(0), m_timeCFD(0), m_finishCode(0),
+    m_channelLength(0), m_channelHeaderLength(0),
+    m_chanID(0), m_slotID(0), m_crateID(0),
+    m_cfdTrigSourceBit(0), m_cfdFailBit(0), m_traceLength(0),
+    m_modMSPS(0), m_adcResolution(0), m_hdwrRevision(0),
+    m_adcOverflowUnderflow(false),
+    m_energySums(), m_qdcSums(), m_trace()
 {}
 
 /** 
@@ -50,31 +35,30 @@ DAQ::DDAS::DDASHit::DDASHit() :
  */
 void
 DAQ::DDAS::DDASHit::Reset() {
-    time = 0;
-    coarsetime = 0;
-    energy = 0;
-    timehigh = 0;
-    timelow = 0;
-    timecfd = 0;
-    finishcode = 0;
-    channellength = 0;
-    channelheaderlength = 0;
-    chanid = 0;
-    slotid = 0;
-    crateid = 0;
-    cfdtrigsourcebit = 0;
-    cfdfailbit = 0;
-    tracelength = 0;
-    ModMSPS = 0;
-
-    energySums.clear();
-    qdcSums.clear();
-    trace.clear();
-      
-    externalTimestamp = 0;
+    m_time = 0;
+    m_externalTimestamp = 0;
+    m_coarseTime = 0;
+    m_energy = 0;
+    m_timeHigh = 0;
+    m_timeLow = 0;
+    m_timeCFD = 0;
+    m_finishCode = 0;
+    m_channelLength = 0;
+    m_channelHeaderLength = 0;
+    m_chanID = 0;
+    m_slotID = 0;
+    m_crateID = 0;
+    m_cfdTrigSourceBit = 0;
+    m_cfdFailBit = 0;
+    m_traceLength = 0;
+    m_modMSPS = 0;      
     m_adcResolution = 0;
     m_hdwrRevision = 0;
     m_adcOverflowUnderflow = false;
+    
+    m_energySums.clear();
+    m_qdcSums.clear();
+    m_trace.clear();    
 }
 	
 /** 
@@ -86,37 +70,37 @@ DAQ::DDAS::DDASHit::~DDASHit()
 void
 DAQ::DDAS::DDASHit::setChannel(uint32_t channel)
 {
-    chanid = channel;
+    m_chanID = channel;
 }
 
 void
 DAQ::DDAS::DDASHit::setSlot(uint32_t slot)
 {
-    slotid = slot;
+    m_slotID = slot;
 }
 
 void
 DAQ::DDAS::DDASHit::setCrate(uint32_t crate)
 {
-    crateid = crate;
+    m_crateID = crate;
 }
 
 void
 DAQ::DDAS::DDASHit::setChannelHeaderLength(uint32_t channelHeaderLength)
 {
-    channelheaderlength = channelHeaderLength;
+    m_channelHeaderLength = channelHeaderLength;
 }
 
 void
 DAQ::DDAS::DDASHit::setChannelLength(uint32_t channelLength)
 {
-    channellength = channelLength;
+    m_channelLength = channelLength;
 }
 
 void
 DAQ::DDAS::DDASHit::setFinishCode(bool finishCode)
 {
-    finishcode = finishCode;
+    m_finishCode = finishCode;
 }
 
 /**
@@ -135,13 +119,13 @@ DAQ::DDAS::DDASHit::setFinishCode(bool finishCode)
 void
 DAQ::DDAS::DDASHit::setCoarseTime(uint64_t time)
 {
-    coarsetime = time;
+    m_coarseTime = time;
 }
 
 void
 DAQ::DDAS::DDASHit::setRawCFDTime(uint32_t data)
 {
-    timecfd = data;
+    m_timeCFD = data;
 }
 
 /**
@@ -156,7 +140,7 @@ DAQ::DDAS::DDASHit::setRawCFDTime(uint32_t data)
 void
 DAQ::DDAS::DDASHit::setCFDTrigSourceBit(uint32_t bit)
 {
-    cfdtrigsourcebit = bit;
+    m_cfdTrigSourceBit = bit;
 }
 
 /**
@@ -169,43 +153,43 @@ DAQ::DDAS::DDASHit::setCFDTrigSourceBit(uint32_t bit)
 void
 DAQ::DDAS::DDASHit::setCFDFailBit(uint32_t bit)
 {
-    cfdfailbit = bit;
+    m_cfdFailBit = bit;
 }
 
 void
 DAQ::DDAS::DDASHit::setTimeLow(uint32_t datum)
 {
-    timelow = datum;
+    m_timeLow = datum;
 }
 
 void
 DAQ::DDAS::DDASHit::setTimeHigh(uint32_t datum)
 {
-    timehigh = datum & LOWER_16_BIT_MASK;
+    m_timeHigh = datum & LOWER_16_BIT_MASK;
 }
 
 void
 DAQ::DDAS::DDASHit::setTime(double compTime)
 {
-    time = compTime;
+    m_time = compTime;
 }
 
 void
-DAQ::DDAS::DDASHit::setEnergy(uint32_t value)
+DAQ::DDAS::DDASHit::setEnergy(uint32_t energy)
 {
-    energy = value;
+    m_energy = energy;
 }
 	
 void
 DAQ::DDAS::DDASHit::setTraceLength(uint32_t length)
 {
-    tracelength = length;
+    m_traceLength = length;
 }
 
 void
-DAQ::DDAS::DDASHit::setADCFrequency(uint32_t value)
+DAQ::DDAS::DDASHit::setADCFrequency(uint32_t msps)
 {
-    ModMSPS = value;
+    m_modMSPS = msps;
 }
 
 void
@@ -223,25 +207,25 @@ DAQ::DDAS::DDASHit::setHardwareRevision(int value)
 void
 DAQ::DDAS::DDASHit::appendEnergySum(uint32_t value)
 {
-    energySums.push_back(value);
+    m_energySums.push_back(value);
 }
 
 void
 DAQ::DDAS::DDASHit::appendQDCSum(uint32_t value)
 {
-    qdcSums.push_back(value);
+    m_qdcSums.push_back(value);
 }
 
 void
 DAQ::DDAS::DDASHit::appendTraceSample(uint16_t value)
 {
-    trace.push_back(value);
+    m_trace.push_back(value);
 }
 
 void
 DAQ::DDAS::DDASHit::setExternalTimestamp(uint64_t value)
 {
-    externalTimestamp = value;
+    m_externalTimestamp = value;
 }
 
 void
@@ -256,27 +240,28 @@ DAQ::DDAS::DDASHit::setADCOverflowUnderflow(bool state)
 
 void
 DAQ::DDAS::DDASHit::copyIn(const DDASHit& rhs) {
-    time = rhs.time;
-    coarsetime = rhs.coarsetime;
-    energy= rhs.energy;
-    timehigh = rhs.timehigh;
-    timelow = rhs.timelow;
-    timecfd = rhs.timecfd;
-    finishcode = rhs.finishcode;
-    channellength = rhs.channellength;
-    channelheaderlength = rhs.channelheaderlength;
-    chanid = rhs.chanid;
-    slotid= rhs.slotid;
-    crateid = rhs.crateid;
-    cfdtrigsourcebit = rhs.cfdtrigsourcebit;
-    cfdfailbit = rhs.cfdfailbit;
-    tracelength =rhs.tracelength;
-    ModMSPS = rhs.ModMSPS;
-    energySums = rhs.energySums;
-    qdcSums =rhs.qdcSums;
-    trace = rhs.trace;
-    externalTimestamp= rhs.externalTimestamp;
+    m_time = rhs.m_time;
+    m_externalTimestamp= rhs.m_externalTimestamp;
+    m_coarseTime = rhs.m_coarseTime;
+    m_energy= rhs.m_energy;
+    m_timeHigh = rhs.m_timeHigh;
+    m_timeLow = rhs.m_timeLow;
+    m_timeCFD = rhs.m_timeCFD;
+    m_finishCode = rhs.m_finishCode;
+    m_channelLength = rhs.m_channelLength;
+    m_channelHeaderLength = rhs.m_channelHeaderLength;
+    m_chanID = rhs.m_chanID;
+    m_slotID = rhs.m_slotID;
+    m_crateID = rhs.m_crateID;
+    m_cfdTrigSourceBit = rhs.m_cfdTrigSourceBit;
+    m_cfdFailBit = rhs.m_cfdFailBit;
+    m_traceLength =rhs.m_traceLength;
+    m_modMSPS = rhs.m_modMSPS;
     m_hdwrRevision = rhs.m_hdwrRevision;
     m_adcResolution= rhs.m_adcResolution;
-    m_adcOverflowUnderflow = rhs.m_adcOverflowUnderflow;      
+    m_adcOverflowUnderflow = rhs.m_adcOverflowUnderflow;
+    
+    m_energySums = rhs.m_energySums;
+    m_qdcSums =rhs.m_qdcSums;
+    m_trace = rhs.m_trace;
 }

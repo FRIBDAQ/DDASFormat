@@ -8,12 +8,12 @@
   http://www.gnu.org/licenses/gpl.txt
 
   Authors:
-      Ron Fox
-      Jeromy Tompkins 
-      Aaron Chester
-      NSCL
-      Michigan State University
-      East Lansing, MI 48824-1321
+          Ron Fox
+          Jeromy Tompkins 
+          Aaron Chester
+          Facility for Rare Isotope Beams
+          Michigan State University
+          East Lansing, MI 48824-1321
 */
 
 /**
@@ -34,7 +34,7 @@ namespace DAQ {
     namespace DDAS {
 	
 	/**
-	 * @addtogroup format libddasformat.so
+	 * @addtogroup format libDDASFormat.so
 	 * @brief DDAS data format library.
 	 *
 	 * @details
@@ -44,11 +44,6 @@ namespace DAQ {
 	 * collection of getter and setter functions to access and manipulate 
 	 * data.
 	 * @{
-	 */
-
-	/**
-	 * @todo (ASC 7/12/23): Should follow relatively normal FRIBDAQ 
-	 * conventions for DDASHit and use m_X to denote member variables.
 	 */
 	
 	/**
@@ -80,35 +75,38 @@ namespace DAQ {
 	 * and `sizeOfHit` is the size also in 32-bit words. Note that 
 	 * `pData + sizeOfHit` is a pointer off the end of the current hit.
 	 */
-	class DDASHit { 
-
+	class DDASHit {
+	    
 	private:
-	    /* Channel events always have the following info. */
-	    double   time;          //!< Assembled time including CFD.
-	    uint64_t coarsetime;    //!< Assembled time without CFD.
-	    uint32_t timehigh;      //!< Bits 32-47 of timestamp.
-	    uint32_t timelow;       //!< Bits 0-31 of timestamp.
-	    uint32_t timecfd;       //!< Raw cfd time.
-	    uint32_t energy;        //!< Energy of event.
-	    uint32_t finishcode;    //!< Indicates whether pile-up occurred.
-	    uint32_t channellength; //!< Number of 32-bit words of raw data.
-	    uint32_t channelheaderlength; //!< Length of header.
-	    uint32_t chanid;        //!< Channel index.
-	    uint32_t slotid;        //!< Slot index.
-	    uint32_t crateid;       //!< Crate index.
-	    /** Value of trigger source bit for 250 MSPS and 500 MSPS. */
-	    uint32_t cfdtrigsourcebit;
-	    uint32_t cfdfailbit;    //!< Indicates whether the CFD algo failed.
-	    uint32_t tracelength;   //!< Length of stored trace.
-	    uint32_t ModMSPS;       //!< Sampling rate of the module (MSPS).
-	    std::vector<uint32_t> energySums; //!< Energy sum data.
-	    std::vector<uint32_t> qdcSums;    //!< QDC sum data.
-	    std::vector<uint16_t> trace;      //!< Trace data.
-	    uint64_t externalTimestamp;       //!< External timestamp.
-	    int      m_hdwrRevision;          //!< Hardware revision.
-	    int      m_adcResolution;         //!< ADC resolution.
-	    /** Whether the ADC over- or under-flowed (=1 if so)*/
-	    bool     m_adcOverflowUnderflow;
+	    
+	    // Channel events always have the following info:
+	    
+	    double   m_time;          //!< Assembled time including CFD.
+	    uint64_t m_coarseTime;    //!< Assembled time without CFD.
+	    uint64_t m_externalTimestamp; //!< External timestamp.
+	    uint32_t m_timeHigh;      //!< Bits 32-47 of timestamp.
+	    uint32_t m_timeLow;       //!< Bits 0-31 of timestamp.
+	    uint32_t m_timeCFD;       //!< Raw cfd time.
+	    uint32_t m_energy;        //!< Energy of event.
+	    uint32_t m_finishCode;    //!< Indicates whether pile-up occurred.
+	    uint32_t m_channelLength; //!< Number of 32-bit words of raw data.
+	    uint32_t m_channelHeaderLength; //!< Length of header.
+	    uint32_t m_chanID;        //!< Channel index.
+	    uint32_t m_slotID;        //!< Slot index.
+	    uint32_t m_crateID;       //!< Crate index.
+	    uint32_t m_cfdTrigSourceBit; //!< ADC clock cycle for CFD ZCP.
+	    uint32_t m_cfdFailBit;    //!< Indicates whether the CFD failed.
+	    uint32_t m_traceLength;   //!< Length of stored trace.
+	    uint32_t m_modMSPS;       //!< Sampling rate of the module (MSPS).
+	    int      m_hdwrRevision;  //!< Hardware revision.
+	    int      m_adcResolution; //!< ADC resolution.
+	    bool     m_adcOverflowUnderflow; //!< =1 if over- or under-flow.
+
+	    // Storage for extra data which may be present in a hit:
+	    
+	    std::vector<uint32_t> m_energySums; //!< Energy sum data.
+	    std::vector<uint32_t> m_qdcSums;    //!< QDC sum data.
+	    std::vector<uint16_t> m_trace;      //!< Trace data.
 	    
 	public:
 	    /** @brief Default constructor. */
@@ -139,32 +137,7 @@ namespace DAQ {
 	     * initialization
 	     */
 	    void Reset();
-	    
-	    /** 
-	     * @brief Retrieve the energy.
-	     * @details
-	     * With the advent of Pixie-16 modules with 16-bit ADCs, the 
-	     * GetEnergy() method no longer includes the ADC 
-	     * overflow/underflow bit. The overflow/underflow bit can be 
-	     * accessed via the GetADCOverflowUnderflow() method instead.
-	     * @return The energy.
-	     */
-	    uint32_t GetEnergy() const { return energy; }	    
-	    /** 
-	     * @brief Retrieve most significant 16-bits of raw timestamp.
-	     * @return The upper 16 bits of the 48-bit timestamp. 
-	     */
-	    uint32_t GetTimeHigh() const { return timehigh; }	    
-	    /** 
-	     * @brief Retrieve least significant 32-bit of raw timestamp.
-	     * @return The lower 16 bits of the 48-bit timestamp. 
-	     */
-	    uint32_t GetTimeLow() const { return timelow; }	    
-	    /**
-	     * @brief Retrieve the raw CFD time.
-	     * @return The raw CFD time value from the data word. 
-	     */
-	    uint32_t GetTimeCFD() const { return timecfd; }	    
+
 	    /** 
 	     * @brief Retrieve computed time 
 	     * @details
@@ -178,24 +151,24 @@ namespace DAQ {
 	     *
 	     * For the 100 MSPS modules:
 	     *
-	     * \f[\text{time} = 10\times((\text{timehigh} << 32) 
-	     * + \text{timelow} + \text{timecfd}/2^{15})\f]
+	     * \f[\text{time} = 10\times((\text{timeHigh} << 32) 
+	     * + \text{timeLow} + \text{timeCFD}/2^{15})\f]
 	     *  
 	     * For the 250 MSPS modules:
 	     *
-	     * \f[\text{time} = 8\times((\text{timehigh} << 32) 
-	     * + \text{timelow}) + 4\times(\text{timecfd}/2^{14}
-	     * - \text{cfdtrigsourcebit})\f]
+	     * \f[\text{time} = 8\times((\text{timeHigh} << 32) 
+	     * + \text{timeLow}) + 4\times(\text{timeCFD}/2^{14}
+	     * - \text{cfdTrigSourceBit})\f]
 	     *
 	     * For the 500 MSPS modules:
 	     *
-	     * \f[\text{time} = 10\times((\text{timehigh} << 32) 
-	     * + \text{timelow}) + 2\times(\text{timecfd}/2^{13}
-	     * + \text{cfdtrigsourcebit} - 1)\f]
+	     * \f[\text{time} = 10\times((\text{timeHigh} << 32) 
+	     * + \text{timeLow}) + 2\times(\text{timeCFD}/2^{13}
+	     * + \text{cfdTrigSourceBit} - 1)\f]
 	     *
-	     * @return double  The timestamp in units of nanoseconds.
+	     * @return double The timestamp in units of nanoseconds.
 	     */
-	    double GetTime() const { return time; }	    
+	    double getTime() const { return m_time; }
 	    /** 
 	     * @brief Retrieve the 48-bit timestamp in nanoseconds without 
 	     * any CFD correction.
@@ -212,14 +185,39 @@ namespace DAQ {
 	     *   the leading-edge trigger point.
 	     * @return The raw 48-bit timestamp in nanoseconds. 
 	     */
-	    uint64_t GetCoarseTime() const { return coarsetime; }	    
+	    uint64_t getCoarseTime() const { return m_coarseTime; }
+	    /** 
+	     * @brief Retrieve the energy.
+	     * @details
+	     * With the advent of Pixie-16 modules with 16-bit ADCs, the 
+	     * `getEnergy()` method no longer includes the ADC 
+	     * overflow/underflow bit. The overflow/underflow bit can be 
+	     * accessed via the `getADCOverflowUnderflow()` method instead.
+	     * @return The energy.
+	     */
+	    uint32_t getEnergy() const { return m_energy; }	    
+	    /** 
+	     * @brief Retrieve most significant 16-bits of raw timestamp.
+	     * @return The upper 16 bits of the 48-bit timestamp. 
+	     */
+	    uint32_t getTimeHigh() const { return m_timeHigh; }	    
+	    /** 
+	     * @brief Retrieve least significant 32-bit of raw timestamp.
+	     * @return The lower 16 bits of the 48-bit timestamp. 
+	     */
+	    uint32_t getTimeLow() const { return m_timeLow; }	    
+	    /**
+	     * @brief Retrieve the raw CFD time.
+	     * @return The raw CFD time value from the data word. 
+	     */
+	    uint32_t getTimeCFD() const { return m_timeCFD; }	    
 	    /** 
 	     * @brief Retrieve finish code
 	     * @return The finish code.
 	     * @details
 	     * The finish code will be set to 1 if pileup was detected.
 	     */
-	    uint32_t GetFinishCode() const { return finishcode; }	    
+	    uint32_t getFinishCode() const { return m_finishCode; }	    
 	    /** 
 	     * @brief Retrieve number of 32-bit words that were in original 
 	     * data packet.
@@ -228,97 +226,94 @@ namespace DAQ {
 	     * Note that this only really makes sense to be used if the object 
 	     * was filled with data using UnpackChannelData().
 	     */
-	    uint32_t GetChannelLength() const { return channellength; }	    
+	    uint32_t getChannelLength() const { return m_channelLength; }	    
 	    /** 
 	     * @brief Retrieve length of header in original data packet. 
 	     * @return Length of the channel header. 
 	     */
-	    uint32_t GetChannelLengthHeader()
-		const { return channelheaderlength; }	    	    
+	    uint32_t getChannelHeaderLength() const { return m_channelHeaderLength; }	    	    
 	    /** 
 	     * @brief Retrieve the slot that the module resided in. 
 	     * @return Module slot. 
 	     */
-	    uint32_t GetSlotID() const { return slotid; }	    
+	    uint32_t getSlotID() const { return m_slotID; }	    
 	    /** 
 	     * @brief Retrieve the index of the crate the module resided in. 
 	     * @return Module crate ID. 
 	     */
-	    uint32_t GetCrateID() const { return crateid; }	    
+	    uint32_t getCrateID() const { return m_crateID; }	    
 	    /** 
 	     * @brief Retrieve the channel index. 
 	     * @return Channel index on the module. 
 	     */
-	    uint32_t GetChannelID() const { return chanid; }	    
+	    uint32_t getChannelID() const { return m_chanID; }	    
 	    /** 
 	     * @brief Retrieve the ADC frequency of the module. 
 	     * @return Module ADC MSPS. 
 	     */
-	    uint32_t GetModMSPS() const { return ModMSPS; }	    
+	    uint32_t getModMSPS() const { return m_modMSPS; }	    
 	    /** 
 	     * @brief Retrieve the hardware revision. 
 	     * @return int  Module hardware revision number. 
 	     */
-	    int GetHardwareRevision() const { return m_hdwrRevision; }	    
+	    int getHardwareRevision() const { return m_hdwrRevision; }	    
 	    /** 
 	     * @brief Retrieve the ADC resolution.
 	     * @return Module ADC resolution (bit depth). 
 	     */
-	    int GetADCResolution() const { return m_adcResolution; }	    
+	    int getADCResolution() const { return m_adcResolution; }	    
 	    /** 
 	     * @brief Retrieve trigger source bit from CFD data. 
 	     * @return The CFD trigger source bit.
 	     */
-	    uint32_t GetCFDTrigSource()
-		const { return cfdtrigsourcebit; }
+	    uint32_t getCFDTrigSource()	const { return m_cfdTrigSourceBit; }
 	    /** 
 	     * @brief Retreive failure bit from CFD data.
 	     * @return The CFD fail bit.
 	     * @details
 	     * The fail bit == 1 if the CFD fails, 0 otherwise.
 	     */
-	    uint32_t GetCFDFailBit() const { return cfdfailbit; }	    
+	    uint32_t getCFDFailBit() const { return m_cfdFailBit; }	    
 	    /**
 	     * @brief Retrieve trace length 
 	     * @return The trace length in ADC samples.
 	     */
-	    uint32_t GetTraceLength() const { return tracelength; }	    
+	    uint32_t getTraceLength() const { return m_traceLength; }	    
 	    /** 
 	     * @brief Access the trace data 
 	     * @return The ADC trace.
 	     */
-	    std::vector<uint16_t>& GetTrace() { return trace; }
+	    std::vector<uint16_t>& getTrace() { return m_trace; }
 	    /** 
 	     * @brief Access the trace data 
 	     * @return The ADC trace.
 	     */
-	    const std::vector<uint16_t>& GetTrace() const { return trace; }
+	    const std::vector<uint16_t>& getTrace() const { return m_trace; }
 	    /** 
 	     * @brief Access the energy/baseline sum data.
 	     * @return The energy sum data.
 	     */
-	    std::vector<uint32_t>& GetEnergySums() { return energySums; }
+	    std::vector<uint32_t>& getEnergySums() { return m_energySums; }
 	    /** 
 	     * @brief Access the energy/baseline sum data.
 	     * @return The energy sum data.
 	     */
-	    const std::vector<uint32_t>& GetEnergySums()
-		const { return energySums; }	    
+	    const std::vector<uint32_t>& getEnergySums() const { return m_energySums; }	    
 	    /** 
 	     * @brief Access the QDC data.
 	     * @return The QDC sum data.
 	     */
-	    std::vector<uint32_t>& GetQDCSums() { return qdcSums; }	    
+	    std::vector<uint32_t>& getQDCSums() { return m_qdcSums; }	    
 	    /** 
 	     * @brief Access the QDC data.
 	     * @return The QDC sum data.
 	     */
-	    const std::vector<uint32_t>& GetQDCSums() const { return qdcSums; }
+	    const std::vector<uint32_t>& getQDCSums() const { return m_qdcSums; }
 	    /**
 	     * @brief Retrieve the external timestamp.
 	     * @return The 48-bit external timestamp in nanoseconds.
 	     */
-	    uint64_t GetExternalTimestamp() const { return externalTimestamp; }
+	    uint64_t getExternalTimestamp() const { return m_externalTimestamp; }
 	    /** 
 	     * @brief Retrieve the ADC overflow/underflow status
 	     * @return bool
@@ -329,8 +324,7 @@ namespace DAQ {
 	     * the 4th header word. In the 16 bit modules, this is the value 
 	     * of bit 31 in the 4th header word.
 	     */
-	    bool GetADCOverflowUnderflow()
-		const { return m_adcOverflowUnderflow; }
+	    bool getADCOverflowUnderflow() const { return m_adcOverflowUnderflow; }
 
 	    /**
 	     * @brief Set the channel ID.
@@ -351,8 +345,7 @@ namespace DAQ {
 	     * @brief Set the channel header length
 	     * @param channelHeaderLength Channel header length of this hit.
 	     */
-	    void setChannelHeaderLength(uint32_t channelHeaderLength);
-	    
+	    void setChannelHeaderLength(uint32_t channelHeaderLength);	    
 	    /**
 	     * @brief Set the channel length.
 	     * @param channelLength The length of the hit.
@@ -403,9 +396,9 @@ namespace DAQ {
 	    void setTime(double compTime);
 	    /**
 	     * @brief Set the energy for this hit.
-	     * @param value The energy for this hit.
+	     * @param energy The energy for this hit.
 	     */
-	    void setEnergy(uint32_t value);
+	    void setEnergy(uint32_t energy);
 	    /**
 	     * @brief Set the ADC trace length.
 	     * @param length The length of the trace in 16-bit words (samples).
@@ -416,11 +409,11 @@ namespace DAQ {
 	     * which recorded this hit.
 	     * @param value The ADC frequency in MSPS.
 	     */
-	    void setADCFrequency(uint32_t value);
+	    void setADCFrequency(uint32_t msps);
 	    /**
 	     * @brief Set the value of the ADC resolution (bit depth) for the 
 	     * ADC which recorded this hit.
-	     * @param value The ADC resolution.
+	     * @param msps The ADC resolution.
 	     */
 	    void setADCResolution(int value);
 	    /**

@@ -46,18 +46,18 @@ DAQ::DDAS::DDASHitUnpacker::unpack(
 
     // Finished upacking the minimum set of data:
 	    
-    uint32_t channelheaderlength = hit.GetChannelLengthHeader();
-    uint32_t channellength = hit.GetChannelLength();
-    size_t tracelength = hit.GetTraceLength();
+    uint32_t channelHeaderLength = hit.getChannelHeaderLength();
+    uint32_t channellength       = hit.getChannelLength();
+    size_t   tracelength         = hit.getTraceLength();
 	    
     // We may have more data to unpack:
 	    
-    if(channellength != (channelheaderlength + tracelength/2)){
+    if(channellength != (channelHeaderLength + tracelength/2)){
 	std::stringstream errmsg;
 	errmsg << "ERROR: Data corruption: ";
 	errmsg << "Inconsistent data lengths found in header ";
 	errmsg << "\nChannel length = " << std::setw(8) << channellength;
-	errmsg << "\nHeader length  = " << std::setw(8) << channelheaderlength;
+	errmsg << "\nHeader length  = " << std::setw(8) << channelHeaderLength;
 	errmsg << "\nTrace length   = " << std::setw(8) << tracelength;
 	throw std::runtime_error(errmsg.str());
     }
@@ -69,7 +69,7 @@ DAQ::DDAS::DDASHitUnpacker::unpack(
     // Trace:       ceil(0.5*L*f)
     //   where L = trace length in microseconds, f = module MSPS
 
-    uint32_t extraWords = channelheaderlength - SIZE_OF_RAW_EVENT;
+    uint32_t extraWords = channelHeaderLength - SIZE_OF_RAW_EVENT;
 
     if (extraWords) {
 	if(extraWords == SIZE_OF_EXT_TS) {
@@ -226,20 +226,20 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWords1And2(
     DDASHit& hit, const uint32_t* data
     )
 {
-    uint32_t timelow      = *data++;
+    uint32_t timeLow      = *data++;
     uint32_t datum1       = *data++;
-    uint32_t timehigh     = datum1 & LOWER_16_BIT_MASK;
-    uint32_t adcFrequency = hit.GetModMSPS();
+    uint32_t timeHigh     = datum1 & LOWER_16_BIT_MASK;
+    uint32_t adcFrequency = hit.getModMSPS();
 
     double   cfdCorrection;
     uint32_t cfdtrigsource, cfdfailbit, timecfd;
     uint64_t coarseTime;
 
-    coarseTime = computeCoarseTime(adcFrequency, timelow, timehigh) ;
+    coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh) ;
     cfdCorrection = parseAndComputeCFD(hit, datum1);
 
-    hit.setTimeLow(timelow);
-    hit.setTimeHigh(timehigh);
+    hit.setTimeLow(timeLow);
+    hit.setTimeHigh(timeHigh);
     hit.setCoarseTime(coarseTime); 
     hit.setTime(static_cast<double>(coarseTime) + cfdCorrection);
 
@@ -281,8 +281,8 @@ DAQ::DDAS::DDASHitUnpacker::parseTraceData(
     DDASHit& hit, const uint32_t* data
     )
 {
-    std::vector<uint16_t>& trace = hit.GetTrace();
-    size_t tracelength = hit.GetTraceLength();
+    std::vector<uint16_t>& trace = hit.getTrace();
+    size_t tracelength = hit.getTraceLength();
     trace.reserve(tracelength);
     for(size_t i = 0; i < tracelength/2; i++){
 	uint32_t datum = *data++;
@@ -344,7 +344,7 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
 
     double correction;
     uint32_t cfdtrigsource, cfdfailbit, timecfd;
-    uint32_t ModMSPS = hit.GetModMSPS();
+    uint32_t ModMSPS = hit.getModMSPS();
 
     // check on the module MSPS and pick the correct CFD unpacking algorithm 
     if(ModMSPS == 100){
@@ -385,27 +385,27 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
  *
  * For the 100 MSPS module:
  *
- * \f[\text{time} = 10\times((\text{timehigh} << 32) 
- * + \text{timelow})\f]
+ * \f[\text{time} = 10\times((\text{timeHigh} << 32) 
+ * + \text{timeLow})\f]
  *  
  * For the 250 MSPS module...
  *
- * \f[\text{time} = 8\times((\text{timehigh} << 32) 
- * + \text{timelow})\f]
+ * \f[\text{time} = 8\times((\text{timeHigh} << 32) 
+ * + \text{timeLow})\f]
  *
  * For the 500 MSPS module,
  *
- * \f[\text{time} = 10\times((\text{timehigh} << 32) 
- * + \text{timelow})\f]
+ * \f[\text{time} = 10\times((\text{timeHigh} << 32) 
+ * + \text{timeLow})\f]
  */
 uint64_t
 DAQ::DDAS::DDASHitUnpacker::computeCoarseTime(
-    uint32_t adcFrequency, uint32_t timelow, uint32_t timehigh
+    uint32_t adcFrequency, uint32_t timeLow, uint32_t timeHigh
     )
 {
-    uint64_t tstamp = timehigh;
+    uint64_t tstamp = timeHigh;
     tstamp = tstamp << 32;
-    tstamp |= timelow;
+    tstamp |= timeLow;
 
     // Conversion to units of real time depends on module type:
     
@@ -434,7 +434,7 @@ DAQ::DDAS::DDASHitUnpacker::extractEnergySums(
     const uint32_t* data, DDASHit& hit
     )
 {
-    std::vector<uint32_t>& energies = hit.GetEnergySums();
+    std::vector<uint32_t>& energies = hit.getEnergySums();
     energies.reserve(SIZE_OF_ENE_SUMS);
     energies.insert(energies.end(), data, data + SIZE_OF_ENE_SUMS);
     
@@ -444,13 +444,13 @@ DAQ::DDAS::DDASHitUnpacker::extractEnergySums(
 /**
  * @details
  * QDC sums consist of SIZE_OF_QDC_SUMS (=8) 32-bit words. If the hit is not 
- * reset between calls  to this function, the QDC sum data will be appended 
+ * reset between calls to this function, the QDC sum data will be appended 
  * to the end of the exisiting QDC sums.
  */
 const uint32_t*
 DAQ::DDAS::DDASHitUnpacker::extractQDC(const uint32_t* data, DDASHit& hit)
 {
-    std::vector<uint32_t>& qdcVals = hit.GetQDCSums();
+    std::vector<uint32_t>& qdcVals = hit.getQDCSums();
     qdcVals.reserve(SIZE_OF_QDC_SUMS);
     qdcVals.insert(qdcVals.end(), data, data + SIZE_OF_QDC_SUMS);
     
