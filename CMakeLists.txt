@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.13)
+
+project(DDASFormat VERSION 0.1)
+
+# Specify the C++ standard:
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Set the top-level library target:
+
+set (toplevel_sources
+  DDASHit.cpp DDASHitUnpacker.cpp
+  )
+
+set (toplevel_headers
+  DDASBitMasks.h DDASHit.h DDASHitUnpacker.h
+  )
+
+add_library(DDASFormat SHARED ${toplevel_sources})
+
+# Compile flags for the library:
+
+target_compile_options(DDASFormat PRIVATE -g -O2)
+target_link_options(DDASFormat PRIVATE -g)
+
+# Set install path for headers and libs:
+
+install (
+  FILES ${toplevel_headers} DESTINATION include
+  )
+install (TARGETS DDASFormat DESTINATION lib)
+
