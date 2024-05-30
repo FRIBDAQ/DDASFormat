@@ -13,8 +13,9 @@ The format library consists of:
 
 ## Requirements
 
-* gcc 4.8.1+ (copmpiler support for c++11 standard)
-* `cmake` version 3.13+
+* `cmake` version 3.13+ - Minimum supported `cmake` version.
+* gcc 4.8.1+ - Compiler support for c++11 standard.
+* CppUnit - To build unit tests.
 
 ## Installation instructions
 

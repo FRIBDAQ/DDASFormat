@@ -31,3 +31,20 @@ install (
   )
 install (TARGETS DDASFormat DESTINATION lib)
 
+##
+# Unit tests
+#
+
+enable_testing()
+
+add_executable(unpackertests
+  TestRunner.cpp
+  unpackertests.cpp
+  )
+
+target_compile_options(unpackertests PRIVATE -g -O2)
+target_link_options(unpackertests PRIVATE -g)
+
+target_link_libraries(unpackertests DDASFormat cppunit)
+
+add_test(NAME unpacker COMMAND unpackertests)
