@@ -2,10 +2,16 @@ cmake_minimum_required(VERSION 3.13)
 
 project(DDASFormat VERSION 0.1)
 
+option(BUILD_DOCS "Build documentation" ON)
+
 # Specify the C++ standard:
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Add subdirectories for e.g., documentation:
+
+add_subdirectory(docs)
 
 # Set the top-level library target:
 
