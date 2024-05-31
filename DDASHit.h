@@ -407,13 +407,13 @@ namespace DAQ {
 	    /**
 	     * @brief Set the value of the ADC frequency in MSPS for the ADC
 	     * which recorded this hit.
-	     * @param value The ADC frequency in MSPS.
+	     * @param msps The ADC frequency in MSPS.
 	     */
 	    void setADCFrequency(uint32_t msps);
 	    /**
 	     * @brief Set the value of the ADC resolution (bit depth) for the 
 	     * ADC which recorded this hit.
-	     * @param msps The ADC resolution.
+	     * @param value The ADC resolution.
 	     */
 	    void setADCResolution(int value);
 	    /**
