@@ -29,7 +29,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/opt/ddasformat/0.1
 make all install test
 ```
 
-For `cmake` 3.15+, one can use the `install` and `prefix` options of the `cmake` command:
+Running the tests using `ctest -VV` will in general give better feedback than `make test` about which tests are failing and why. Once may prefer to `make all install && ctest -VV`. For `cmake` 3.15+, one can use the `install` and `prefix` options of the `cmake` command:
 
 ```
 mkdir build

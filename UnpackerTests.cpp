@@ -34,21 +34,21 @@ using namespace ::DAQ::DDAS;
 template<class T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec)
 {
-  stream << "{ ";
-  for (auto& element : vec ) stream << element << " ";
-  stream << "}";
+    stream << "{ ";
+    for (auto& element : vec ) stream << element << " ";
+    stream << "}";
 
-  return stream;
+    return stream;
 }
 
 template<class T, long unsigned int N>
 std::ostream& operator<<(std::ostream& stream, const std::array<T,N>& vec)
 {
-  stream << "{ ";
-  for (int i=0; i<N; ++i) stream << vec[i] << " ";
-  stream << "}";
+    stream << "{ ";
+    for (int i=0; i<N; ++i) stream << vec[i] << " ";
+    stream << "}";
 
-  return stream;
+    return stream;
 }
 
 class UnpackerTests : public CppUnit::TestFixture
@@ -83,6 +83,15 @@ public:
     CPPUNIT_TEST(time_250);
     CPPUNIT_TEST(cfdFail_250);
     CPPUNIT_TEST(cfdTrigSource_250);
+
+    CPPUNIT_TEST(msps_500);
+    CPPUNIT_TEST(revision_500);
+    CPPUNIT_TEST(resolution_500);
+    CPPUNIT_TEST(coarseTime_500);
+    CPPUNIT_TEST(time_500);
+    CPPUNIT_TEST(cfdTrigSource_500);
+    CPPUNIT_TEST(cfdFail_500_0);
+    CPPUNIT_TEST(cfdFail_500_1);
     
     CPPUNIT_TEST(externalClock_0);
     CPPUNIT_TEST(externalClock_1);
@@ -93,8 +102,7 @@ public:
 
 public:
     /** 
-     * @brief Configure and unpack a sample hit. Note that this sample hit 
-     * re-uses some words to test the unpacker.
+     * @brief Configure and unpack some sample hits.
      */
     void setUp()
 	{
@@ -116,13 +124,14 @@ public:
 
 	    // 250 MSPS data:
 	    data[1] = 0x0f1000fa; // Module ID word
-	    data[4] = 0x547f000a;
+	    data[4] = 0x547f000a; // Upper 16 bits are CFD info
 	    tie(hit250, ignore) = unpacker.unpack(
 		data.data(), data.data()+data.size()
 		);    
 	    
 	    // 500 MSPS data:
-	    data[1] = 0x0c0c01f4;
+	    data[1] = 0x0f0e01f4; // Module ID word
+	    data[4] = 0x747f000a; // Upper 16 bits are CFD info
 	    tie(hit500, ignore) = unpacker.unpack(
 		data.data(), data.data()+data.size()
 		);    
@@ -149,7 +158,7 @@ public:
 	{
 	    EQMSG(
 		"100 MSPS extract slot ID",
-		  uint32_t(2), hit100.getSlotID()
+		uint32_t(2), hit100.getSlotID()
 		);
 	}
     
@@ -354,6 +363,100 @@ public:
     // Tests for 500 MSPS modules
     //
 
+    /** @brief Read MSPS from module identifier word for 500 MSPS. */
+    void msps_500 ()
+	{
+	    EQMSG(
+		"500 MSPS extract module MSPS",
+		uint32_t(500), hit500.getModMSPS()
+		); 
+	}
+
+    /** @brief Read revision from module idntifier word for 500 MSPS. */
+    void revision_500 ()
+	{
+	    EQMSG(
+		"500 MSPS extract hardware revision",
+		15, hit500.getHardwareRevision()
+		);
+	}
+    
+    /** 
+     * @brief Read ADC resolution (bit depth) from module identifier word 
+     * for 16-bit 500 MSPS. 
+     */
+    void resolution_500 ()
+	{
+	    EQMSG(
+		"500 MSPS extract ADC resolution",
+		14, hit500.getADCResolution()
+		);
+	}
+    
+    /** @brief Read coarse time from 500 MSPS module. */
+    void coarseTime_500 ()
+	{
+	    EQMSG(
+		"500 MSPS compute coarse time",
+		uint64_t(0x000a0000f687)*10, hit500.getCoarseTime()
+		); 
+	}
+    
+    /** @brief Read computed time from 500 MSPS module. */
+    void time_500 ()
+	{
+	    // The magic number is reconstructed TS for 500 MSPS:
+	    ASSERTMSG(
+		"500 MSPS compute time",
+		std::abs(hit500.getTime()-429497360715.281006) < 0.000001
+		); 
+	}
+
+    /** @brief Read CFD trigger source from 500 MSPS module. */   
+    void cfdTrigSource_500 ()
+	{
+	    EQMSG(
+		"500 MSPS compute CFD trig source bit",
+		uint32_t(3), hit500.getCFDTrigSource()
+		);
+	}
+
+    /** 
+     * @brief Read CFD fail bit from 500 MSPS module data. Since trigger 
+     * source < 7, this must be 0.
+     */
+    void cfdFail_500_0 ()
+	{
+	    // Source is < 7 so the fail bit is 0:
+	    EQMSG(
+		"500 MSPS compute CFD fail bit",
+		uint32_t(0), hit500.getCFDFailBit()
+		);
+	}
+
+    /** 
+     * @brief Read CFD fail bit from 500 MSPS module. Check that the fail bit 
+     * is properly set when the trigger source == 7.
+     */
+    void cfdFail_500_1 ()
+	{
+	    // Bits [31:29] of 0xf47f000a (=111) are the trigger source:
+	    vector<uint32_t> data = {
+		0x0000000c, 0x0f0e01f4, 0x00084321, 0x0000f687,
+		0xf47f000a, 0x000008b3
+	    };
+    
+	    DDASHit hit;
+	    DDASHitUnpacker unpacker;
+	    unpacker.unpack(data.data(), data.data()+data.size(), hit);
+	    
+	    // Source is == 7 so the fail bit is 1:
+	    EQMSG(
+		"500 MSPS compute CFD fail bit",
+		uint32_t(1), hit.getCFDFailBit()
+		);
+	}
+    
     //_______________________________________________________________________
     // Tests for external clock
     //
@@ -382,7 +485,7 @@ public:
 		0x0000000e, 0x0c0c0064, 0x000c6000, 0x139f2709,
 		0x28170000, 0x00007fff,	0x40302010, 0x00a00a00
 	    };
-
+	    
 	    DDASHit hit;
 	    DDASHitUnpacker unpacker;
 	    unpacker.unpack(data.data(), data.data()+data.size(), hit);
@@ -404,7 +507,7 @@ public:
 		0x0000000e, 0x0c0c0064, 0x0014a000, 0x139f2709,
 		0x28170000, 0x00007fff, 0x00000001, 0x00000002, 
 		0x00000003, 0x00000004, 0x40302010, 0x00a00a00 };
-
+	    
 	    DDASHit hit;
 	    DDASHitUnpacker unpacker;
 	    unpacker.unpack(data.data(), data.data()+data.size(), hit);

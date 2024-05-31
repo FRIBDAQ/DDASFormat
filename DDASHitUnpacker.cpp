@@ -230,13 +230,9 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWords1And2(
     uint32_t datum1       = *data++;
     uint32_t timeHigh     = datum1 & LOWER_16_BIT_MASK;
     uint32_t adcFrequency = hit.getModMSPS();
-
-    double   cfdCorrection;
-    uint32_t cfdtrigsource, cfdfailbit, timecfd;
-    uint64_t coarseTime;
-
-    coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh) ;
-    cfdCorrection = parseAndComputeCFD(hit, datum1);
+    
+    uint64_t coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh) ;
+    double cfdCorrection = parseAndComputeCFD(hit, datum1);
 
     hit.setTimeLow(timeLow);
     hit.setTimeHigh(timeHigh);
@@ -304,32 +300,32 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data)
 {
 
     double correction;
-    uint32_t cfdtrigsource, cfdfailbit, timecfd;
+    uint32_t cfdTrigSource, cfdFailBit, timeCFD;
 
     // Check on the module MSPS and pick the correct CFD unpacking algorithm 
     if(ModMSPS == 100){
 	// 100 MSPS modules don't have trigger source bits
-	cfdfailbit    = ((data & BIT_31_MASK) >> 31) ; 
-	cfdtrigsource = 0;
-	timecfd       = ((data & BIT_30_TO_16_MASK) >> 16);
-	correction    = (timecfd/32768.0)*10.0; // 32768 = 2^15
+	cfdFailBit    = ((data & BIT_31_MASK) >> 31) ; 
+	cfdTrigSource = 0;
+	timeCFD       = ((data & BIT_30_TO_16_MASK) >> 16);
+	correction    = (timeCFD/32768.0)*10.0; // 32768 = 2^15
     }
     else if (ModMSPS == 250) {
 	// CFD fail bit in bit 31
-	cfdfailbit    = ((data & BIT_31_MASK) >> 31);
-	cfdtrigsource = ((data & BIT_30_MASK) >> 30);
-	timecfd       = ((data & BIT_29_TO_16_MASK) >> 16);
-	correction    = (timecfd/16384.0 - cfdtrigsource)*4.0; 
+	cfdFailBit    = ((data & BIT_31_MASK) >> 31);
+	cfdTrigSource = ((data & BIT_30_MASK) >> 30);
+	timeCFD       = ((data & BIT_29_TO_16_MASK) >> 16);
+	correction    = (timeCFD/16384.0 - cfdTrigSource)*4.0; 
     }
     else if (ModMSPS == 500) {
 	// No fail bit in 500 MSPS modules
-	cfdtrigsource = ((data & BIT_31_TO_29_MASK) >> 29);
-	timecfd       = ((data & BIT_28_TO_16_MASK) >> 16);
-	correction    = (timecfd/8192.0 + cfdtrigsource - 1)*2.0;
-	cfdfailbit    = (cfdtrigsource == 7) ? 1 : 0;
+	cfdTrigSource = ((data & BIT_31_TO_29_MASK) >> 29);
+	timeCFD       = ((data & BIT_28_TO_16_MASK) >> 16);
+	correction    = (timeCFD/8192.0 + cfdTrigSource - 1)*2.0;
+	cfdFailBit    = (cfdTrigSource == 7) ? 1 : 0;
     }
 
-    return std::make_tuple(correction, timecfd, cfdtrigsource, cfdfailbit);
+    return std::make_tuple(correction, timeCFD, cfdTrigSource, cfdFailBit);
 }
 
 /**
@@ -341,37 +337,36 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data)
 double
 DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
 {
-
     double correction;
-    uint32_t cfdtrigsource, cfdfailbit, timecfd;
+    uint32_t cfdTrigSource, cfdFailBit, timeCFD;
     uint32_t ModMSPS = hit.getModMSPS();
 
     // check on the module MSPS and pick the correct CFD unpacking algorithm 
     if(ModMSPS == 100){
 	// 100 MSPS modules don't have trigger source bits
-	cfdfailbit    = ((data & BIT_31_MASK) >> 31) ; 
-	cfdtrigsource = 0;
-	timecfd       = ((data & BIT_30_TO_16_MASK) >> 16);
-	correction    = (timecfd/32768.0)*10.0; // 32768 = 2^15
+	cfdFailBit    = ((data & BIT_31_MASK) >> 31) ; 
+	cfdTrigSource = 0;
+	timeCFD       = ((data & BIT_30_TO_16_MASK) >> 16);
+	correction    = (timeCFD/32768.0)*10.0; // 32768 = 2^15
     }
     else if (ModMSPS == 250) {
 	// CFD fail bit in bit 31
-	cfdfailbit    = ((data & BIT_31_MASK) >> 31 );
-	cfdtrigsource = ((data & BIT_30_MASK) >> 30 );
-	timecfd       = ((data & BIT_29_TO_16_MASK) >> 16);
-	correction    = (timecfd/16384.0 - cfdtrigsource)*4.0; 
+	cfdFailBit    = ((data & BIT_31_MASK) >> 31 );
+	cfdTrigSource = ((data & BIT_30_MASK) >> 30 );
+	timeCFD       = ((data & BIT_29_TO_16_MASK) >> 16);
+	correction    = (timeCFD/16384.0 - cfdTrigSource)*4.0; 
     }
     else if (ModMSPS == 500) {
 	// no fail bit in 500 MSPS modules
-	cfdtrigsource = ((data & BIT_31_TO_29_MASK) >> 29 );
-	timecfd       = ((data & BIT_28_TO_16_MASK) >> 16);
-	correction    = (timecfd/8192.0 + cfdtrigsource - 1)*2.0;
-	cfdfailbit    = (cfdtrigsource == 7) ? 1 : 0;
+	cfdTrigSource = ((data & BIT_31_TO_29_MASK) >> 29);
+	timeCFD       = ((data & BIT_28_TO_16_MASK) >> 16);
+	correction    = (timeCFD/8192.0 + cfdTrigSource - 1)*2.0;
+	cfdFailBit    = (cfdTrigSource == 7) ? 1 : 0;
     }
 
-    hit.setCFDFailBit(cfdfailbit);
-    hit.setCFDTrigSourceBit(cfdtrigsource);
-    hit.setRawCFDTime(timecfd);
+    hit.setCFDFailBit(cfdFailBit);
+    hit.setCFDTrigSourceBit(cfdTrigSource);
+    hit.setRawCFDTime(timeCFD);
 
     return correction;
 }
