@@ -13,10 +13,10 @@ The format library consists of the following:
 
 ## Requirements
 
-* `cmake` version 3.13.4+ - Minimum supported `cmake` version.
-* gcc 4.8.1+ - Compiler support for the C++11 standard.
-* CppUnit 1.14.0+ - To build unit tests.
-* Doxygen 1.8.13+ - To build documentation.
+* `cmake` version 3.13.4 - Required `cmake` version for building the project.
+* gcc 4.8.1 - Compiler support for the C++11 standard.
+* CppUnit 1.14.0 - To build unit tests.
+* Doxygen 1.8.13 - To build documentation.
 
 ## Installation instructions
 
