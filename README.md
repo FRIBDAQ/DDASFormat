@@ -9,9 +9,11 @@ This project provides a single DDAS format library and unpacker which can be use
 The format library consists of the following:
 * DAQ::DDAS::DDASHit - A class which encapsulates the information emitted by a Pixie-16 digitizer. It contains information for a single channel only.
 * DAQ::DDAS::DDASHitUnpacker - Unpacks DDAS data recorded by NSCLDAQ into DDASHits.
-* DDASBitMasks.h - A header file contianing masks used to extract information from specific parts of XIA Pixie list-mode data.
+* DDASBitMasks.h - A header file containing masks used to extract information from specific parts of XIA Pixie list-mode data.
 
 ## Requirements
+
+The minimum software requirements are listed below. The code has been built and tested extensively on Debian 10 (buster) and Debian 11 (bullseye) systems at FRIB.
 
 * `cmake` version 3.13.4 - Required `cmake` version for building the project.
 * gcc 4.8.1 - Compiler support for the C++11 standard.
