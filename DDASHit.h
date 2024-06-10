@@ -130,7 +130,13 @@ namespace DAQ {
 		    copyIn(obj);
 		}
 		return *this;
-	    }	    
+	    }
+	    /** 
+	     * @brief Destructor. 
+	     * @details
+	     * The destrutor is virtual to ensure proper destruction of 
+	     * objects derived from DDASHit.
+	     */
 	    virtual ~DDASHit();
 	    /** 
 	     * @brief Resets the state of all member data to that of 
