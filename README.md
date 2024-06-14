@@ -27,7 +27,7 @@ This project is built with `cmake`, which prefers out-of-tree builds. There is o
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr/opt/ddasformat/0.1
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/opt/ddasformat/
 make all install test
 ```
 
@@ -38,6 +38,6 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
-cmake --install . --prefix "/usr/opt/ddasformat/1.1"
+cmake --install . --prefix "/usr/opt/ddasformat/"
 ctest -VV
 ```
