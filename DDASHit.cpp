@@ -234,6 +234,35 @@ DAQ::DDAS::DDASHit::setADCOverflowUnderflow(bool state)
     m_adcOverflowUnderflow = state;
 }
 
+void
+DAQ::DDAS::DDASHit::setModuleType(uint32_t msps, int bits, int rev)
+{
+    setADCFrequency(msps);
+    setADCResolution(bits);
+    setHardwareRevision(rev);
+}
+
+void
+DAQ::DDAS::DDASHit::setModuleLocation(
+    uint32_t crate, uint32_t slot, uint32_t chan
+    )
+{
+    setCrate(crate);
+    setSlot(slot);
+    setChannel(chan);
+}
+
+void
+DAQ::DDAS::DDASHit::setModuleInfo(
+    uint32_t crate, uint32_t slot, uint32_t chan,
+    uint32_t msps, int bits, int rev
+    )
+{
+    setModuleLocation(crate, slot, chan);
+    setModuleType(msps, bits, rev);
+}
+
+
 ///
 // Private methods
 //
