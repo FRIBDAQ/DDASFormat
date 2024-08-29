@@ -237,7 +237,9 @@ namespace DAQ {
 	     * @brief Retrieve length of header in original data packet. 
 	     * @return Length of the channel header. 
 	     */
-	    uint32_t getChannelHeaderLength() const { return m_channelHeaderLength; }	    	    
+	    uint32_t getChannelHeaderLength() const {
+		return m_channelHeaderLength;
+	    }	    	    
 	    /** 
 	     * @brief Retrieve the slot that the module resided in. 
 	     * @return Module slot. 
@@ -314,12 +316,16 @@ namespace DAQ {
 	     * @brief Access the QDC data.
 	     * @return The QDC sum data.
 	     */
-	    const std::vector<uint32_t>& getQDCSums() const { return m_qdcSums; }
+	    const std::vector<uint32_t>& getQDCSums() const {
+		return m_qdcSums;
+	    }
 	    /**
 	     * @brief Retrieve the external timestamp.
 	     * @return The 48-bit external timestamp in nanoseconds.
 	     */
-	    uint64_t getExternalTimestamp() const { return m_externalTimestamp; }
+	    uint64_t getExternalTimestamp() const {
+		return m_externalTimestamp;
+	    }
 	    /** 
 	     * @brief Retrieve the ADC overflow/underflow status
 	     * @return bool
@@ -330,23 +336,25 @@ namespace DAQ {
 	     * the 4th header word. In the 16 bit modules, this is the value 
 	     * of bit 31 in the 4th header word.
 	     */
-	    bool getADCOverflowUnderflow() const { return m_adcOverflowUnderflow; }
+	    bool getADCOverflowUnderflow() const {
+		return m_adcOverflowUnderflow;
+	    }
 
 	    /**
 	     * @brief Set the channel ID.
 	     * @param channel Channel value for this hit.
 	     */
-	    void setChannel(uint32_t channel);
+	    void setChannelID(uint32_t channel);
 	    /**
 	     * @brief Set the slot ID.
 	     * @param slot Slot value for this hit.
 	     */
-	    void setSlot(uint32_t slot);
+	    void setSlotID(uint32_t slot);
 	    /**
 	     * @brief Set the crate ID.
 	     * @param crate Crate ID value for this hit.
 	     */
-	    void setCrate(uint32_t crate);
+	    void setCrateID(uint32_t crate);
 	    /**
 	     * @brief Set the channel header length
 	     * @param channelHeaderLength Channel header length of this hit.

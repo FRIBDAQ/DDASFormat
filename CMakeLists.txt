@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(DDASFormat VERSION 1.1.000)
+project(DDASFormat VERSION 1.0.003)
 
 option(BUILD_DOCS "Build documentation" ON)
 
