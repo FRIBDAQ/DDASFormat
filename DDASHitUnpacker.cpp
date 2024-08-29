@@ -196,9 +196,9 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWord0(
     )
 {
     uint32_t datum = *data++;
-    hit.setChannel(datum & CHANNEL_ID_MASK);
-    hit.setSlot((datum & SLOT_ID_MASK) >> SLOT_ID_SHIFT);
-    hit.setCrate((datum & CRATE_ID_MASK) >> CRATE_ID_SHIFT);
+    hit.setChannelID(datum & CHANNEL_ID_MASK);
+    hit.setSlotID((datum & SLOT_ID_MASK) >> SLOT_ID_SHIFT);
+    hit.setCrateID((datum & CRATE_ID_MASK) >> CRATE_ID_SHIFT);
     hit.setChannelHeaderLength(
 	(datum & HEADER_LENGTH_MASK) >> HEADER_LENGTH_SHIFT
 	);

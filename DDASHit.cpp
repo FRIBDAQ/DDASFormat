@@ -68,19 +68,19 @@ DAQ::DDAS::DDASHit::~DDASHit()
 {}
 
 void
-DAQ::DDAS::DDASHit::setChannel(uint32_t channel)
+DAQ::DDAS::DDASHit::setChannelID(uint32_t channel)
 {
     m_chanID = channel;
 }
 
 void
-DAQ::DDAS::DDASHit::setSlot(uint32_t slot)
+DAQ::DDAS::DDASHit::setSlotID(uint32_t slot)
 {
     m_slotID = slot;
 }
 
 void
-DAQ::DDAS::DDASHit::setCrate(uint32_t crate)
+DAQ::DDAS::DDASHit::setCrateID(uint32_t crate)
 {
     m_crateID = crate;
 }
