@@ -455,35 +455,6 @@ namespace DAQ {
 	     *   under- or overflows the ADC.
 	     */	    
 	    void setADCOverflowUnderflow(bool state);
-	    /**
-	     * @brief Set the module HW type.
-	     * @param msps Module MSPS.
-	     * @param bits Bit depth.
-	     * @param rev Module ADC revision.
-	     */
-	    void setModuleType(uint32_t msps, int bits, int rev);
-	    /**
-	     * @brief Set the module location.
-	     * @param crate Crate ID.
-	     * @param slot Slot ID.
-	     * @param chan Channel ID.
-	     */
-	    void setModuleLocation(
-		uint32_t crate, uint32_t slot, uint32_t chan
-		);
-	    /**
-	     * @brief Set the module type and location.
-	     * @param crate Crate ID.
-	     * @param slot Slot ID.
-	     * @param chan Channel ID.
-	     * @param msps Module MSPS.
-	     * @param bits Bit depth.
-	     * @param rev Module ADC revision.
-	     */
-	    void setModuleInfo(
-		uint32_t crate, uint32_t slot, uint32_t chan,
-		uint32_t msps, int bits, int rev
-		);
 	};
 
 	/** @} */
