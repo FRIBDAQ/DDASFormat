@@ -423,7 +423,7 @@ namespace DAQ {
 	     * which recorded this hit.
 	     * @param msps The ADC frequency in MSPS.
 	     */
-	    void setADCFrequency(uint32_t msps);
+	    void setModMSPS(uint32_t msps);
 	    /**
 	     * @brief Set the value of the ADC resolution (bit depth) for the 
 	     * ADC which recorded this hit.
@@ -442,15 +442,30 @@ namespace DAQ {
 	     */
 	    void appendEnergySum(uint32_t value);
 	    /**
+	     * @brief Set the energy sum data from an existing set of sums.
+	     * @param eneSums Vector of energy sums.
+	     */
+	    void setEnergySums(std::vector<uint32_t> eneSums);
+	    /**
 	     * @brief Append a QDC value to the vector of QDC sums.
 	     * @param value  The QDC value appended to the vector.
 	     */
 	    void appendQDCSum(uint32_t value);
 	    /**
+	     * @brief Set the QDC sum data from an existing set of sums.
+	     * @param qdc Vector of QDC sums.
+	     */
+	    void setQDCSums(std::vector<uint32_t> qdcSums);
+	    /**
 	     * @brief Append a 16-bit ADC trace sample to the trace vector.
 	     * @param value The 16-bit ADC sample appended to the vector.
 	     */
 	    void appendTraceSample(uint16_t value);
+	    /**
+	     * @brief Set the trace data from an existing trace.
+	     * @param trace The trace.
+	     */
+	    void setTrace(std::vector<uint16_t> trace);
 	    /**
 	     * @brief Set the value of the external timestamp.
 	     * @param value The value of the external timestamp supplied 

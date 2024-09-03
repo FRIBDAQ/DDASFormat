@@ -187,7 +187,7 @@ DAQ::DDAS::DDASHit::setTraceLength(uint32_t length)
 }
 
 void
-DAQ::DDAS::DDASHit::setADCFrequency(uint32_t msps)
+DAQ::DDAS::DDASHit::setModMSPS(uint32_t msps)
 {
     m_modMSPS = msps;
 }
@@ -211,15 +211,48 @@ DAQ::DDAS::DDASHit::appendEnergySum(uint32_t value)
 }
 
 void
+DAQ::DDAS::DDASHit::setEnergySums(std::vector<uint32_t> eneSums)
+{
+    if (eneSums.size() != SIZE_OF_ENE_SUMS) {
+	std::string msg("Error setting energy sums: Expected ");
+	msg += std::to_string(SIZE_OF_ENE_SUMS);
+	msg += " 32-bit words but got ";
+	msg += std::to_string(eneSums.size());
+	throw std::runtime_error(msg);
+    }
+    m_energySums = eneSums;
+}
+
+void
 DAQ::DDAS::DDASHit::appendQDCSum(uint32_t value)
 {
     m_qdcSums.push_back(value);
 }
 
 void
+DAQ::DDAS::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums)
+{
+    if (qdcSums.size() != SIZE_OF_QDC_SUMS) {
+	std::string msg("Error setting QDC sums: Expected ");
+	msg += std::to_string(SIZE_OF_QDC_SUMS);
+	msg += " 32-bit words but got ";
+	msg += std::to_string(qdcSums.size());
+	throw std::runtime_error(msg);
+    }
+    m_qdcSums = qdcSums;
+}
+
+void
 DAQ::DDAS::DDASHit::appendTraceSample(uint16_t value)
 {
     m_trace.push_back(value);
+}
+
+void
+DAQ::DDAS::DDASHit::setTrace(std::vector<uint16_t> trace)
+{
+    m_trace = trace;
+    setTraceLength(m_trace.size());
 }
 
 void

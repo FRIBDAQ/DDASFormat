@@ -96,8 +96,7 @@ DAQ::DDAS::DDASHitUnpacker::unpack(
 	    data = extractQDC(data, hit);
 	
 	} else if(
-	    extraWords == (SIZE_OF_ENE_SUMS + SIZE_OF_QDC_SUMS
-			   + SIZE_OF_EXT_TS)
+	    extraWords == (SIZE_OF_ENE_SUMS + SIZE_OF_QDC_SUMS + SIZE_OF_EXT_TS)
 	    ) {
 	    data = extractEnergySums(data, hit);
 	    data = extractQDC(data, hit);
@@ -170,7 +169,7 @@ DAQ::DDAS::DDASHitUnpacker::parseModuleInfo(
     )
 {
     uint32_t datum = *data++;
-    hit.setADCFrequency(datum & LOWER_16_BIT_MASK);
+    hit.setModMSPS(datum & LOWER_16_BIT_MASK);
     hit.setADCResolution((datum & ADC_RESOLUTION_MASK) >> ADC_RESOLUTION_SHIFT);
     hit.setHardwareRevision((datum & HW_REVISION_MASK) >> HW_REVISION_SHIFT);
 
