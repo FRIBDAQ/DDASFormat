@@ -453,7 +453,7 @@ namespace DAQ {
 	    void appendQDCSum(uint32_t value);
 	    /**
 	     * @brief Set the QDC sum data from an existing set of sums.
-	     * @param qdc Vector of QDC sums.
+	     * @param qdcSums Vector of QDC sums.
 	     */
 	    void setQDCSums(std::vector<uint32_t> qdcSums);
 	    /**
