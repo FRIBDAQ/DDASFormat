@@ -31,26 +31,27 @@
 using namespace std;
 using namespace ::DAQ::DDAS;
 
-template<class T>
-std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec)
-{
-    stream << "{ ";
-    for (auto& element : vec ) stream << element << " ";
-    stream << "}";
+namespace std {
+	template<class T>
+	std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec)
+	{
+		stream << "{ ";
+		for (auto& element : vec ) stream << element << " ";
+		stream << "}";
 
-    return stream;
+		return stream;
+	}
+
+	template<class T, long unsigned int N>
+	std::ostream& operator<<(std::ostream& stream, const std::array<T,N>& vec)
+	{
+		stream << "{ ";
+		for (int i=0; i<N; ++i) stream << vec[i] << " ";
+		stream << "}";
+
+		return stream;
+	}
 }
-
-template<class T, long unsigned int N>
-std::ostream& operator<<(std::ostream& stream, const std::array<T,N>& vec)
-{
-    stream << "{ ";
-    for (int i=0; i<N; ++i) stream << vec[i] << " ";
-    stream << "}";
-
-    return stream;
-}
-
 class UnpackerTests : public CppUnit::TestFixture
 {
 private:
