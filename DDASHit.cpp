@@ -1,3 +1,21 @@
+/*
+    This software is Copyright by the Board of Trustees of Michigan
+    State University (c) Copyright 2016.
+
+    You may use this software under the terms of the GNU public license
+    (GPL).  The terms of this license are described at:
+
+     http://www.gnu.org/licenses/gpl.txt
+
+     Author:
+             Ron Fox
+	     Jeromy Tompkins
+	     Aaron Chester
+	     Facility for Rare Isotope Beams
+	     Michigan State University
+	     East Lansing, MI 48824-1321
+*/
+
 /** 
  * @file DDASHit.cpp
  * @brief Implement DDASHit class used to encapsulate DDAS events.
@@ -13,11 +31,13 @@
 
 #include "DDASBitMasks.h"
 
+using namespace ddasfmt;
+
 /** 
  * @details
  * All member data are zero-initialized.
  */
-DAQ::DDAS::DDASHit::DDASHit() :
+ddasfmt::DDASHit::DDASHit() :
     m_time(0), m_coarseTime(0), m_externalTimestamp(0), m_energy(0),
     m_timeHigh(0), m_timeLow(0), m_timeCFD(0), m_finishCode(0),
     m_channelLength(0), m_channelHeaderLength(0),
@@ -34,7 +54,7 @@ DAQ::DDAS::DDASHit::DDASHit() :
  * data (i.e. trace), the vector is cleared and resized to 0.
  */
 void
-DAQ::DDAS::DDASHit::Reset() {
+ddasfmt::DDASHit::Reset() {
     m_time = 0;
     m_externalTimestamp = 0;
     m_coarseTime = 0;
@@ -64,41 +84,41 @@ DAQ::DDAS::DDASHit::Reset() {
 /** 
  * @brief Destructor.
  */
-DAQ::DDAS::DDASHit::~DDASHit()
+ddasfmt::DDASHit::~DDASHit()
 {}
 
 void
-DAQ::DDAS::DDASHit::setChannelID(uint32_t channel)
+ddasfmt::DDASHit::setChannelID(uint32_t channel)
 {
     m_chanID = channel;
 }
 
 void
-DAQ::DDAS::DDASHit::setSlotID(uint32_t slot)
+ddasfmt::DDASHit::setSlotID(uint32_t slot)
 {
     m_slotID = slot;
 }
 
 void
-DAQ::DDAS::DDASHit::setCrateID(uint32_t crate)
+ddasfmt::DDASHit::setCrateID(uint32_t crate)
 {
     m_crateID = crate;
 }
 
 void
-DAQ::DDAS::DDASHit::setChannelHeaderLength(uint32_t channelHeaderLength)
+ddasfmt::DDASHit::setChannelHeaderLength(uint32_t channelHeaderLength)
 {
     m_channelHeaderLength = channelHeaderLength;
 }
 
 void
-DAQ::DDAS::DDASHit::setChannelLength(uint32_t channelLength)
+ddasfmt::DDASHit::setChannelLength(uint32_t channelLength)
 {
     m_channelLength = channelLength;
 }
 
 void
-DAQ::DDAS::DDASHit::setFinishCode(bool finishCode)
+ddasfmt::DDASHit::setFinishCode(bool finishCode)
 {
     m_finishCode = finishCode;
 }
@@ -117,13 +137,13 @@ DAQ::DDAS::DDASHit::setFinishCode(bool finishCode)
  *   the leading-edge trigger point.
  */
 void
-DAQ::DDAS::DDASHit::setCoarseTime(uint64_t time)
+ddasfmt::DDASHit::setCoarseTime(uint64_t time)
 {
     m_coarseTime = time;
 }
 
 void
-DAQ::DDAS::DDASHit::setRawCFDTime(uint32_t data)
+ddasfmt::DDASHit::setRawCFDTime(uint32_t data)
 {
     m_timeCFD = data;
 }
@@ -138,7 +158,7 @@ DAQ::DDAS::DDASHit::setRawCFDTime(uint32_t data)
  * 100 MSPS).
  */
 void
-DAQ::DDAS::DDASHit::setCFDTrigSourceBit(uint32_t bit)
+ddasfmt::DDASHit::setCFDTrigSourceBit(uint32_t bit)
 {
     m_cfdTrigSourceBit = bit;
 }
@@ -151,67 +171,67 @@ DAQ::DDAS::DDASHit::setCFDTrigSourceBit(uint32_t bit)
  * trigger point.
  */
 void
-DAQ::DDAS::DDASHit::setCFDFailBit(uint32_t bit)
+ddasfmt::DDASHit::setCFDFailBit(uint32_t bit)
 {
     m_cfdFailBit = bit;
 }
 
 void
-DAQ::DDAS::DDASHit::setTimeLow(uint32_t datum)
+ddasfmt::DDASHit::setTimeLow(uint32_t datum)
 {
     m_timeLow = datum;
 }
 
 void
-DAQ::DDAS::DDASHit::setTimeHigh(uint32_t datum)
+ddasfmt::DDASHit::setTimeHigh(uint32_t datum)
 {
     m_timeHigh = datum & LOWER_16_BIT_MASK;
 }
 
 void
-DAQ::DDAS::DDASHit::setTime(double compTime)
+ddasfmt::DDASHit::setTime(double compTime)
 {
     m_time = compTime;
 }
 
 void
-DAQ::DDAS::DDASHit::setEnergy(uint32_t energy)
+ddasfmt::DDASHit::setEnergy(uint32_t energy)
 {
     m_energy = energy;
 }
 	
 void
-DAQ::DDAS::DDASHit::setTraceLength(uint32_t length)
+ddasfmt::DDASHit::setTraceLength(uint32_t length)
 {
     m_traceLength = length;
 }
 
 void
-DAQ::DDAS::DDASHit::setModMSPS(uint32_t msps)
+ddasfmt::DDASHit::setModMSPS(uint32_t msps)
 {
     m_modMSPS = msps;
 }
 
 void
-DAQ::DDAS::DDASHit::setADCResolution(int value)
+ddasfmt::DDASHit::setADCResolution(int value)
 {
     m_adcResolution = value;
 }
 
 void
-DAQ::DDAS::DDASHit::setHardwareRevision(int value)
+ddasfmt::DDASHit::setHardwareRevision(int value)
 {
     m_hdwrRevision = value;
 }
 
 void
-DAQ::DDAS::DDASHit::appendEnergySum(uint32_t value)
+ddasfmt::DDASHit::appendEnergySum(uint32_t value)
 {
     m_energySums.push_back(value);
 }
 
 void
-DAQ::DDAS::DDASHit::setEnergySums(std::vector<uint32_t> eneSums)
+ddasfmt::DDASHit::setEnergySums(std::vector<uint32_t> eneSums)
 {
     if (eneSums.size() != SIZE_OF_ENE_SUMS) {
 	std::string msg("Error setting energy sums: Expected ");
@@ -224,13 +244,13 @@ DAQ::DDAS::DDASHit::setEnergySums(std::vector<uint32_t> eneSums)
 }
 
 void
-DAQ::DDAS::DDASHit::appendQDCSum(uint32_t value)
+ddasfmt::DDASHit::appendQDCSum(uint32_t value)
 {
     m_qdcSums.push_back(value);
 }
 
 void
-DAQ::DDAS::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums)
+ddasfmt::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums)
 {
     if (qdcSums.size() != SIZE_OF_QDC_SUMS) {
 	std::string msg("Error setting QDC sums: Expected ");
@@ -243,26 +263,26 @@ DAQ::DDAS::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums)
 }
 
 void
-DAQ::DDAS::DDASHit::appendTraceSample(uint16_t value)
+ddasfmt::DDASHit::appendTraceSample(uint16_t value)
 {
     m_trace.push_back(value);
 }
 
 void
-DAQ::DDAS::DDASHit::setTrace(std::vector<uint16_t> trace)
+ddasfmt::DDASHit::setTrace(std::vector<uint16_t> trace)
 {
     m_trace = trace;
     setTraceLength(m_trace.size());
 }
 
 void
-DAQ::DDAS::DDASHit::setExternalTimestamp(uint64_t value)
+ddasfmt::DDASHit::setExternalTimestamp(uint64_t value)
 {
     m_externalTimestamp = value;
 }
 
 void
-DAQ::DDAS::DDASHit::setADCOverflowUnderflow(bool state)
+ddasfmt::DDASHit::setADCOverflowUnderflow(bool state)
 {
     m_adcOverflowUnderflow = state;
 }
@@ -272,7 +292,7 @@ DAQ::DDAS::DDASHit::setADCOverflowUnderflow(bool state)
 //
 
 void
-DAQ::DDAS::DDASHit::copyIn(const DDASHit& rhs) {
+ddasfmt::DDASHit::copyIn(const DDASHit& rhs) {
     m_time = rhs.m_time;
     m_externalTimestamp= rhs.m_externalTimestamp;
     m_coarseTime = rhs.m_coarseTime;

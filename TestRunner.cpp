@@ -8,6 +8,7 @@
      http://www.gnu.org/licenses/gpl.txt
 
      Author:
+             Ron Fox
              Jeromy Tompkins
 	     NSCL
 	     Michigan State University

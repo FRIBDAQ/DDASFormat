@@ -28,30 +28,30 @@
 #include "DDASHit.h"
 #include "DDASHitUnpacker.h"
 
-using namespace std;
-using namespace ::DAQ::DDAS;
+using namespace ddasfmt;
 
 namespace std {
-	template<class T>
-	std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec)
-	{
-		stream << "{ ";
-		for (auto& element : vec ) stream << element << " ";
-		stream << "}";
+    template<class T>
+    ostream& operator<<(ostream& stream, const vector<T>& vec)
+    {
+	stream << "{ ";
+	for (auto& element : vec ) stream << element << " ";
+	stream << "}";
 
-		return stream;
-	}
+	return stream;
+    }
 
-	template<class T, long unsigned int N>
-	std::ostream& operator<<(std::ostream& stream, const std::array<T,N>& vec)
-	{
-		stream << "{ ";
-		for (int i=0; i<N; ++i) stream << vec[i] << " ";
-		stream << "}";
+    template<class T, long unsigned int N>
+    ostream& operator<<(ostream& stream, const array<T,N>& vec)
+    {
+	stream << "{ ";
+	for (int i = 0; i < N; ++i) stream << vec[i] << " ";
+	stream << "}";
 
-		return stream;
-	}
+	return stream;
+    }
 }
+
 class UnpackerTests : public CppUnit::TestFixture
 {
 private:
@@ -111,7 +111,7 @@ public:
 
 	    // 100 MSPS data:
 	    
-	    vector<uint32_t> data = {
+	    std::vector<uint32_t> data = {
 		0x0000002c, 0x0c0c0064, 0x002d2321, 0x0000f687,
 		0x947f000a, 0x000808be,	0x00000001, 0x00000002,
 		0x00000003, 0x00000004, 0x00000005, 0x00000006,
@@ -119,22 +119,22 @@ public:
 		0x0000000b, 0x0000000c, 0x0a0a0b0b, 0x0c0c0d0d,
 		0x00020001, 0x00040003, 0x00060005, 0x00080007
 	    };
-	    tie(hit100, ignore) = unpacker.unpack(
-		data.data(), data.data()+data.size()
+	    std::tie(hit100, std::ignore) = unpacker.unpack(
+		data.data(), data.data() + data.size()
 		);
 
 	    // 250 MSPS data:
 	    data[1] = 0x0f1000fa; // Module ID word
 	    data[4] = 0x547f000a; // Upper 16 bits are CFD info
-	    tie(hit250, ignore) = unpacker.unpack(
-		data.data(), data.data()+data.size()
+	    std::tie(hit250, std::ignore) = unpacker.unpack(
+		data.data(), data.data() + data.size()
 		);    
 	    
 	    // 500 MSPS data:
 	    data[1] = 0x0f0e01f4; // Module ID word
 	    data[4] = 0x747f000a; // Upper 16 bits are CFD info
-	    tie(hit500, ignore) = unpacker.unpack(
-		data.data(), data.data()+data.size()
+	    std::tie(hit500, std::ignore) = unpacker.unpack(
+		data.data(), data.data() + data.size()
 		);    
 	}
 
@@ -442,7 +442,7 @@ public:
     void cfdFail_500_1 ()
 	{
 	    // Bits [31:29] of 0xf47f000a (=111) are the trigger source:
-	    vector<uint32_t> data = {
+	    std::vector<uint32_t> data = {
 		0x0000000c, 0x0f0e01f4, 0x00084321, 0x0000f687,
 		0xf47f000a, 0x000008b3
 	    };
@@ -545,5 +545,6 @@ public:
     
 };
 
-// Register it with the test factory
+// Register it with the test factory:
+
 CPPUNIT_TEST_SUITE_REGISTRATION(UnpackerTests);
