@@ -1,3 +1,20 @@
+/*
+    This software is Copyright by the Board of Trustees of Michigan
+    State University (c) Copyright 2016.
+
+    You may use this software under the terms of the GNU public license
+    (GPL).  The terms of this license are described at:
+
+     http://www.gnu.org/licenses/gpl.txt
+
+     Author:
+             Jeromy Tompkins
+	     Aaron Chester
+	     Facility for Rare Isotope Beams
+	     Michigan State University
+	     East Lansing, MI 48824-1321
+*/
+
 /**
  * @file DDASHitUnpacker.cpp
  * @brief Implementation of an unpacker for DDAS data recorded by 
@@ -12,6 +29,8 @@
 #include <stdexcept>
 
 #include "DDASBitMasks.h"
+
+using namespace ddasfmt;
 	
 /**
  * @details
@@ -25,7 +44,7 @@
  * method. 
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::unpack(
+ddasfmt::DDASHitUnpacker::unpack(
     const uint32_t* beg, const uint32_t* sentinel, DDASHit& hit
     )
 {
@@ -124,8 +143,8 @@ DAQ::DDAS::DDASHitUnpacker::unpack(
  * hit. Prior to parsing, all data members are reset to 0 using the Reset() 
  * method. 
  */
-std::tuple<DAQ::DDAS::DDASHit, const uint32_t*>
-DAQ::DDAS::DDASHitUnpacker::unpack(
+std::tuple<ddasfmt::DDASHit, const uint32_t*>
+ddasfmt::DDASHitUnpacker::unpack(
     const uint32_t *beg, const uint32_t* sentinel
     )
 {
@@ -140,7 +159,7 @@ DAQ::DDAS::DDASHitUnpacker::unpack(
  * event size in 16-bit words. 
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseBodySize(
+ddasfmt::DDASHitUnpacker::parseBodySize(
     const uint32_t* data, const uint32_t* sentinel
     )
 {
@@ -164,7 +183,7 @@ DAQ::DDAS::DDASHitUnpacker::parseBodySize(
  * hardware revision and ADC resolution.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseModuleInfo(
+ddasfmt::DDASHitUnpacker::parseModuleInfo(
     DDASHit& hit, const uint32_t* data
     )
 {
@@ -190,7 +209,7 @@ DAQ::DDAS::DDASHitUnpacker::parseModuleInfo(
  * from bits [17:30] allowing up to 16383 32-bit words per channel hit.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseHeaderWord0(
+ddasfmt::DDASHitUnpacker::parseHeaderWord0(
     DDASHit& hit, const uint32_t* data
     )
 {
@@ -221,7 +240,7 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWord0(
  * - The CFD result.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseHeaderWords1And2(
+ddasfmt::DDASHitUnpacker::parseHeaderWords1And2(
     DDASHit& hit, const uint32_t* data
     )
 {
@@ -253,7 +272,7 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWords1And2(
  * for `parseHeaderWord0()` for more info.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseHeaderWord3(
+ddasfmt::DDASHitUnpacker::parseHeaderWord3(
     DDASHit& hit, const uint32_t* data
     )
 {
@@ -272,7 +291,7 @@ DAQ::DDAS::DDASHitUnpacker::parseHeaderWord3(
  * than 16-bit resolution, those bits are set to 0.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::parseTraceData(
+ddasfmt::DDASHitUnpacker::parseTraceData(
     DDASHit& hit, const uint32_t* data
     )
 {
@@ -295,7 +314,7 @@ DAQ::DDAS::DDASHitUnpacker::parseTraceData(
  * `parseModuleInfo()`.
  */
 std::tuple<double, uint32_t, uint32_t, uint32_t>
-DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data)
+ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data)
 {
 
     double correction;
@@ -334,7 +353,7 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data)
  * `parseModuleInfo()`.
  */
 double
-DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
+ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
 {
     double correction;
     uint32_t cfdTrigSource, cfdFailBit, timeCFD;
@@ -393,7 +412,7 @@ DAQ::DDAS::DDASHitUnpacker::parseAndComputeCFD(DDASHit& hit, uint32_t data)
  * + \text{timeLow})\f]
  */
 uint64_t
-DAQ::DDAS::DDASHitUnpacker::computeCoarseTime(
+ddasfmt::DDASHitUnpacker::computeCoarseTime(
     uint32_t adcFrequency, uint32_t timeLow, uint32_t timeHigh
     )
 {
@@ -424,7 +443,7 @@ DAQ::DDAS::DDASHitUnpacker::computeCoarseTime(
  * data will be appended to the end of the exisiting energy sums.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::extractEnergySums(
+ddasfmt::DDASHitUnpacker::extractEnergySums(
     const uint32_t* data, DDASHit& hit
     )
 {
@@ -442,7 +461,7 @@ DAQ::DDAS::DDASHitUnpacker::extractEnergySums(
  * to the end of the exisiting QDC sums.
  */
 const uint32_t*
-DAQ::DDAS::DDASHitUnpacker::extractQDC(const uint32_t* data, DDASHit& hit)
+ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t* data, DDASHit& hit)
 {
     std::vector<uint32_t>& qdcVals = hit.getQDCSums();
     qdcVals.reserve(SIZE_OF_QDC_SUMS);
@@ -459,7 +478,7 @@ DAQ::DDAS::DDASHitUnpacker::extractQDC(const uint32_t* data, DDASHit& hit)
  * to proper units is left to the user.
  */
 const uint32_t* 
-DAQ::DDAS::DDASHitUnpacker::extractExternalTimestamp(
+ddasfmt::DDASHitUnpacker::extractExternalTimestamp(
     const uint32_t* data, DDASHit& hit
     ) 
 {
