@@ -22,12 +22,12 @@ The minimum software requirements are listed below. The code has been built and 
 
 ## Installation instructions
 
-This project is built with CMake, which prefers out-of-tree builds. There is only one CMake variable: `CMAKE_INSTALL_PREFIX`, which governs where the package is installed. Here is a sample build from the cloned repository:
+This project is built with CMake, which prefers out-of-tree builds. The CMake variable `CMAKE_INSTALL_PREFIX` governs where the package is installed. Here is a sample build from the cloned repository:
 
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr/opt/ddasformat/
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/opt/ddasformat
 make all install test
 ```
 
@@ -38,6 +38,6 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
-cmake --install . --prefix "/usr/opt/ddasformat/"
+cmake --install . --prefix "/usr/opt/ddasformat"
 ctest -VV
 ```
