@@ -13,7 +13,7 @@ if (BUILD_DOCS)
 
   # Configure Doxygen.in in build directory and start the build:
   
-  set (doxyfile_in ${CMAKE_SOURCE_DIR}/docs/Doxyfile.in)
+  set (doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
   set (doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
   configure_file (${doxyfile_in} ${doxyfile} @ONLY)
   
