@@ -32,7 +32,7 @@
 namespace ddasfmt {
 	
     /**
-     * @addtogroup format libDDASFormat.so
+     * @addtogroup ddasfmt libDDASFormat.so
      * @brief DDAS data format library.
      *
      * @details
