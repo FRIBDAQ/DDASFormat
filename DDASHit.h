@@ -174,7 +174,7 @@ namespace ddasfmt {
 	 */
 	double getTime() const { return m_time; }
 	/** 
-	 * @brief Retrieve the 48-bit timestamp in nanoseconds without 
+	 * @brief Retrieve the raw timestamp in nanoseconds without 
 	 * any CFD correction.
 	 * @details
 	 * Latching of the coarse timestamp depends on whether or not 
@@ -187,7 +187,7 @@ namespace ddasfmt {
 	 *   latched to the leading-edge trigger point.
 	 * - If the CFD is disabled, the coarse timestamp is latched to 
 	 *   the leading-edge trigger point.
-	 * @return The raw 48-bit timestamp in nanoseconds. 
+	 * @return The raw timestamp in nanoseconds. 
 	 */
 	uint64_t getCoarseTime() const { return m_coarseTime; }
 	/** 
@@ -197,7 +197,7 @@ namespace ddasfmt {
 	 * `getEnergy()` method no longer includes the ADC 
 	 * overflow/underflow bit. The overflow/underflow bit can be 
 	 * accessed via the `getADCOverflowUnderflow()` method instead.
-	 * @return The energy.
+	 * @return The energy in ADC units.
 	 */
 	uint32_t getEnergy() const { return m_energy; }	    
 	/** 
@@ -207,7 +207,7 @@ namespace ddasfmt {
 	uint32_t getTimeHigh() const { return m_timeHigh; }	    
 	/** 
 	 * @brief Retrieve least significant 32-bit of raw timestamp.
-	 * @return The lower 16 bits of the 48-bit timestamp. 
+	 * @return The lower 32 bits of the 48-bit timestamp. 
 	 */
 	uint32_t getTimeLow() const { return m_timeLow; }	    
 	/**
@@ -321,7 +321,7 @@ namespace ddasfmt {
 	}
 	/**
 	 * @brief Retrieve the external timestamp.
-	 * @return The 48-bit external timestamp in nanoseconds.
+	 * @return The 48-bit external timestamp in clock ticks.
 	 */
 	uint64_t getExternalTimestamp() const {
 	    return m_externalTimestamp;
@@ -469,7 +469,7 @@ namespace ddasfmt {
 	/**
 	 * @brief Set the value of the external timestamp.
 	 * @param value The value of the external timestamp supplied 
-	 *   to DDAS.
+	 *   to DDAS. in clock ticks.
 	 */
 	void setExternalTimestamp(uint64_t value);
 	/**
