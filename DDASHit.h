@@ -331,10 +331,6 @@ namespace ddasfmt {
 	 * @return bool
 	 * @retval true  If the ADC over- or underflows.
 	 * @retval false Otherwise.
-	 * @details
-	 * In the 12 and 14 bit modules, this is the value of bit 15 in 
-	 * the 4th header word. In the 16 bit modules, this is the value 
-	 * of bit 31 in the 4th header word.
 	 */
 	bool getADCOverflowUnderflow() const {
 	    return m_adcOverflowUnderflow;
