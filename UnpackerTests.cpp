@@ -56,9 +56,12 @@ class UnpackerTests : public CppUnit::TestFixture
 {
 private:
     DDASHit hit100, hit250, hit500;
+    std::vector<uint32_t> data;
 
 public:
     CPPUNIT_TEST_SUITE(UnpackerTests);
+
+    CPPUNIT_TEST(bodySize);
     
     CPPUNIT_TEST(crateID_100);
     CPPUNIT_TEST(slotID_100);
@@ -111,7 +114,7 @@ public:
 
 	    // 100 MSPS data:
 	    
-	    std::vector<uint32_t> data = {
+	    data = {
 		0x00000030, 0x0c0c0064, 0x002d2321, 0x0000f687,
 		0x947f000a, 0x000808be,	0x00000001, 0x00000002,
 		0x00000003, 0x00000004, 0x00000005, 0x00000006,
@@ -141,6 +144,17 @@ public:
     /** @brief Delete new'd stuff here. */
     void tearDown() {}
 
+    //_______________________________________________________________________
+    // Verify the body size word is correct
+    //
+
+    void bodySize()
+	{
+	    uint32_t expected = data.size()*sizeof(uint32_t);
+	    uint32_t actual = data[0]*sizeof(uint16_t);
+	    EQMSG("Data body size is correct", expected, actual);  
+	}
+    
     //_______________________________________________________________________
     // Tests for 100 MSPS modules + generic member data
     //
