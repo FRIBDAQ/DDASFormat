@@ -109,26 +109,7 @@ namespace ddasfmt {
     public:
 	/** @brief Default constructor. */
 	DDASHit();
-	    
-    private:
-	/**
-	 * @brief Copy in data from another DDASHit.
-	 * @param rhs Reference to the DDASHit to copy.
-	 */
-	void copyIn(const DDASHit& rhs);
-	    
-    public:      
-	/** @brief Copy constructor */
-	DDASHit(const DDASHit& obj) {
-	    copyIn(obj);
-	}
-	/** @brief Assignment operator */
-	DDASHit& operator=(const DDASHit& obj) {
-	    if (this != &obj) {
-		copyIn(obj);
-	    }
-	    return *this;
-	}
+	
 	/** 
 	 * @brief Destructor. 
 	 * @details

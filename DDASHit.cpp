@@ -286,35 +286,3 @@ ddasfmt::DDASHit::setADCOverflowUnderflow(bool state)
 {
     m_adcOverflowUnderflow = state;
 }
-
-///
-// Private methods
-//
-
-void
-ddasfmt::DDASHit::copyIn(const DDASHit& rhs) {
-    m_time = rhs.m_time;
-    m_externalTimestamp= rhs.m_externalTimestamp;
-    m_coarseTime = rhs.m_coarseTime;
-    m_energy= rhs.m_energy;
-    m_timeHigh = rhs.m_timeHigh;
-    m_timeLow = rhs.m_timeLow;
-    m_timeCFD = rhs.m_timeCFD;
-    m_finishCode = rhs.m_finishCode;
-    m_channelLength = rhs.m_channelLength;
-    m_channelHeaderLength = rhs.m_channelHeaderLength;
-    m_chanID = rhs.m_chanID;
-    m_slotID = rhs.m_slotID;
-    m_crateID = rhs.m_crateID;
-    m_cfdTrigSourceBit = rhs.m_cfdTrigSourceBit;
-    m_cfdFailBit = rhs.m_cfdFailBit;
-    m_traceLength =rhs.m_traceLength;
-    m_modMSPS = rhs.m_modMSPS;
-    m_hdwrRevision = rhs.m_hdwrRevision;
-    m_adcResolution= rhs.m_adcResolution;
-    m_adcOverflowUnderflow = rhs.m_adcOverflowUnderflow;
-    
-    m_energySums = rhs.m_energySums;
-    m_qdcSums =rhs.m_qdcSums;
-    m_trace = rhs.m_trace;
-}
