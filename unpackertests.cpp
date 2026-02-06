@@ -53,7 +53,7 @@ ostream &operator<<(ostream &stream, const array<T, N> &vec) {
 
 class UnpackerTests : public CppUnit::TestFixture {
 private:
-  DDASHit hit100, hit250, hit500;
+  DDASHit hit100, hit250, hit500, hitRevH;
   std::vector<uint32_t> data;
 
 public:
@@ -100,6 +100,13 @@ public:
   CPPUNIT_TEST(externalClock_2);
   CPPUNIT_TEST(externalClock_3);
 
+  CPPUNIT_TEST(crateID_RevH);
+  CPPUNIT_TEST(slotID_RevH);
+  CPPUNIT_TEST(chanID_RevH);
+  CPPUNIT_TEST(headerLength_RevH);
+  CPPUNIT_TEST(eventLength_RevH);
+  CPPUNIT_TEST(finishCode_RevH);
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -129,6 +136,13 @@ public:
     data[1] = 0x0f0e01f4; // Module ID word
     data[4] = 0x747f000a; // Upper 16 bits are CFD info
     std::tie(hit500, std::ignore) =
+        unpacker.unpack(data.data(), data.data() + data.size());
+
+    // Rev. H data (assumed to be 250 MSPS):
+    data[1] = 0x110e00fa; // Module ID word
+    data[2] = 0x002d2701; // Pixie payload word 0
+    data[4] = 0x547f000a; // Upper 16 bits are CFD info
+    std::tie(hitRevH, std::ignore) =
         unpacker.unpack(data.data(), data.data() + data.size());
   }
 
@@ -426,8 +440,43 @@ public:
     EQMSG("Timestamp extracted with QDC and no energy sums",
           uint64_t(0x00a00a0040302010), hit.getExternalTimestamp());
   }
-};
 
-// Register it with the test factory:
+  //_______________________________________________________________________
+  // Tests for Rev. H module word 0 parsing
+  //
 
-CPPUNIT_TEST_SUITE_REGISTRATION(UnpackerTests);
+  /** @brief Check the crate ID value is correctly parsed for Rev. H. */
+  void crateID_RevH() {
+    EQMSG("Rev. H extract crate ID", uint32_t(3), hitRevH.getCrateID());
+  }
+
+  /** @brief Check the slot ID value is correctly parsed for Rev. H. */
+  void slotID_RevH() {
+    EQMSG("Rev. H extract slot ID", uint32_t(2), hitRevH.getSlotID());
+  }
+
+  /** @brief Check the channel ID value is correctly parsed for Rev. H. */
+  void chanID_RevH() {
+    EQMSG("Rev. H extract channel ID", uint32_t(1), hitRevH.getChannelID());
+  }
+
+  /** @brief Check the header length value is correctly parsed for Rev. H. */
+  void headerLength_RevH() {
+    EQMSG("Rev. H extract header length", uint32_t(18),
+          hitRevH.getChannelHeaderLength());
+  }
+
+  /** @brief Check the event length value is correctly parsed for Rev. H. */
+  void eventLength_RevH() {
+    EQMSG("Rev. H extract event length", uint32_t(22),
+          hitRevH.getChannelLength());
+  }
+
+  /** @brief Check the finish code value is correctly parsed for Rev. H. */
+  void finishCode_RevH() {
+    EQMSG("Rev. H extract finish code", uint32_t(0), hitRevH.getFinishCode());
+  };
+
+  // Register it with the test factory:
+
+  CPPUNIT_TEST_SUITE_REGISTRATION(UnpackerTests);

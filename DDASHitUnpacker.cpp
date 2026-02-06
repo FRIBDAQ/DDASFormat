@@ -191,13 +191,30 @@ ddasfmt::DDASHitUnpacker::parseModuleInfo(DDASHit &hit, const uint32_t *data) {
  * from bits [17:29]. In the current data format, the out-of-range flag has
  * been moved to word 3, bit 31, and the channel length mask is extracted
  * from bits [17:30] allowing up to 16383 32-bit words per channel hit.
+ *
+ * @note In hardware revision H, the crate/slot/channel information is stored
+ * differently in word 0. The channel ID is stored in bits [5:0], the slot ID is
+ * stored in bits [9:6], and the crate ID is stored in bits [11:10]. The
+ * unpacker checks the hardware revision from the hit to determine how to parse
+ * the crate/slot/channel information. This implies that the module information
+ * word must be unpacked before this function is called.
  */
 const uint32_t *
 ddasfmt::DDASHitUnpacker::parseHeaderWord0(DDASHit &hit, const uint32_t *data) {
   uint32_t datum = *data++;
-  hit.setChannelID(datum & CHANNEL_ID_MASK);
-  hit.setSlotID((datum & SLOT_ID_MASK) >> SLOT_ID_SHIFT);
-  hit.setCrateID((datum & CRATE_ID_MASK) >> CRATE_ID_SHIFT);
+
+  // Read the module revision to determine how to parse the crate/slot/channel
+  // info. Rev. H is 0x11 = 17 in decimal. We assume if its not Rev. H it
+  // follows the original format.
+  if (hit.getHardwareRevision() == 17) {
+    hit.setChannelID(datum & CHANNEL_ID_MASK_REV_H);
+    hit.setSlotID((datum & SLOT_ID_MASK_REV_H) >> SLOT_ID_SHIFT_REV_H);
+    hit.setCrateID((datum & CRATE_ID_MASK_REV_H) >> CRATE_ID_SHIFT_REV_H);
+  } else {
+    hit.setChannelID(datum & CHANNEL_ID_MASK);
+    hit.setSlotID((datum & SLOT_ID_MASK) >> SLOT_ID_SHIFT);
+    hit.setCrateID((datum & CRATE_ID_MASK) >> CRATE_ID_SHIFT);
+  }
   hit.setChannelHeaderLength((datum & HEADER_LENGTH_MASK) >>
                              HEADER_LENGTH_SHIFT);
   hit.setChannelLength((datum & CHANNEL_LENGTH_MASK) >> CHANNEL_LENGTH_SHIFT);
