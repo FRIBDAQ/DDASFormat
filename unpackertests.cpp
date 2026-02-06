@@ -100,6 +100,7 @@ public:
   CPPUNIT_TEST(externalClock_2);
   CPPUNIT_TEST(externalClock_3);
 
+  CPPUNIT_TEST(revision_revH);
   CPPUNIT_TEST(crateID_RevH);
   CPPUNIT_TEST(slotID_RevH);
   CPPUNIT_TEST(chanID_RevH);
@@ -140,7 +141,7 @@ public:
 
     // Rev. H data (assumed to be 250 MSPS):
     data[1] = 0x110e00fa; // Module ID word
-    data[2] = 0x002d2701; // Pixie payload word 0
+    data[2] = 0x002d2c81; // Pixie payload word 0
     data[4] = 0x547f000a; // Upper 16 bits are CFD info
     std::tie(hitRevH, std::ignore) =
         unpacker.unpack(data.data(), data.data() + data.size());
@@ -445,6 +446,11 @@ public:
   // Tests for Rev. H module word 0 parsing
   //
 
+  /** @brief Check the module revision value is correctly parsed for Rev. H. */
+  void revision_revH() {
+    EQMSG("Rev. H extract revision", uint32_t(17), hitRevH.getHardwareRevision());
+  }
+
   /** @brief Check the crate ID value is correctly parsed for Rev. H. */
   void crateID_RevH() {
     EQMSG("Rev. H extract crate ID", uint32_t(3), hitRevH.getCrateID());
@@ -476,7 +482,8 @@ public:
   void finishCode_RevH() {
     EQMSG("Rev. H extract finish code", uint32_t(0), hitRevH.getFinishCode());
   };
+};
 
-  // Register it with the test factory:
+// Register it with the test factory:
 
-  CPPUNIT_TEST_SUITE_REGISTRATION(UnpackerTests);
+CPPUNIT_TEST_SUITE_REGISTRATION(UnpackerTests);
