@@ -99,7 +99,7 @@ protected:
    *   and the pointer to the last data word is not a nullptr.
    * @return Pointer to the next data word.
    */
-  const uint32_t *parseBodySize(const uint32_t *beg, const uint32_t *sentinel);
+  const uint32_t *parseBodySize(const uint32_t *data, const uint32_t *sentinel);
   /**
    * @brief Parse the module identifying information encoded in the
    *   hit.
@@ -108,7 +108,7 @@ protected:
    *   identifying information.
    * @return Pointer to the next data word.
    */
-  const uint32_t *parseModuleInfo(DDASHit &hit, const uint32_t *beg);
+  const uint32_t *parseModuleInfo(DDASHit &hit, const uint32_t *data);
   /**
    * @brief Parse the word 0 of the Pixie-16 data header.
    * @param hit  References the DDASHit we are unpacking.
@@ -116,21 +116,21 @@ protected:
    * @return Pointer to the next data word (word 1).
 
    */
-  const uint32_t *parseHeaderWord0(DDASHit &hit, const uint32_t *beg);
+  const uint32_t *parseHeaderWord0(DDASHit &hit, const uint32_t *data);
   /**
    * @brief Parse words 1 and 2 of the Pixie-16 data header.
    * @param hit  References the DDASHit we are unpacking.
    * @param data Pointer to word 1.
    * @return Pointer to word 3.
    */
-  const uint32_t *parseHeaderWords1And2(DDASHit &hit, const uint32_t *beg);
+  const uint32_t *parseHeaderWords1And2(DDASHit &hit, const uint32_t *data);
   /**
    * @brief Parse word 3 of the Pixie-16 data header.
    * @param hit  References the DDASHit we are unpacking.
    * @param data Pointer to word 3.
    * @return Pointer to the first word of the Pixie-16 data body.
    */
-  const uint32_t *parseHeaderWord3(DDASHit &hit, const uint32_t *beg);
+  const uint32_t *parseHeaderWord3(DDASHit &hit, const uint32_t *data);
   /**
    * @brief Unpack the trace data.
    * @param hit  References the hit we are unpacking.
@@ -138,7 +138,7 @@ protected:
    *   The 32-bit trace word contains two 16-bit trace ADC values.
    * @return Pointer to the next 32-bit word.
    */
-  const uint32_t *parseTraceData(DDASHit &hit, const uint32_t *beg);
+  const uint32_t *parseTraceData(DDASHit &hit, const uint32_t *data);
   /**
    * @brief Determine the CFD correction to the leading-edge time in
    * nanoseconds from the CFD word.
