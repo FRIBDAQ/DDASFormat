@@ -64,6 +64,16 @@ static const uint32_t CHANNEL_LENGTH_SHIFT = 17; //!< Chan. length offset.
 static const uint32_t FINISH_CODE_SHIFT = 31;    //!< Finish code offset.
 static const uint32_t OUT_OF_RANGE_SHIFT = 31;   //!< ADC overflow offset.
 
+static const uint32_t CHANNEL_ID_MASK_REV_H =
+    0x0000003F; //!< Bits [5:0]: Channel ID in Rev H.
+static const uint32_t SLOT_ID_MASK_REV_H =
+    0x000003C0; //!< Bits [9:6]: Slot ID in Rev H.
+static const uint32_t CRATE_ID_MASK_REV_H =
+    0x00000C00; //!< Bits [11:10]: Crate ID in Rev H.
+
+static const uint32_t SLOT_ID_SHIFT_REV_H = 6;   //!< Slot ID offset in Rev H.
+static const uint32_t CRATE_ID_SHIFT_REV_H = 10; //!< Crate ID offset in Rev H.
+
 // Pixie data sizes:
 
 static const uint32_t SIZE_OF_RAW_EVENT = 4; //!< 32-bit words event header.
