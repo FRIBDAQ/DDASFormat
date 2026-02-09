@@ -10,44 +10,42 @@
      Author:
              Ron Fox
              Jeromy Tompkins
-	     NSCL
-	     Michigan State University
-	     East Lansing, MI 48824-1321
+             NSCL
+             Michigan State University
+             East Lansing, MI 48824-1321
 */
 
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 // Boilerplate code for CPPUNIT tests:
 
-int main(int argc, char** argv)
-{
-    CppUnit::TextUi::TestRunner runner; // Control tests.
-    CppUnit::TestFactoryRegistry&
-	registry(CppUnit::TestFactoryRegistry::getRegistry());
+int main(int argc, char **argv) {
+  CppUnit::TextUi::TestRunner runner; // Control tests.
+  CppUnit::TestFactoryRegistry &registry(
+      CppUnit::TestFactoryRegistry::getRegistry());
 
-    runner.addTest(registry.makeTest());
+  runner.addTest(registry.makeTest());
 
-    bool wasSucessful;
-    try {
-	wasSucessful = runner.run("", false);
-    } 
-    catch(string& rFailure) {
-	cerr << "Caught a string exception from test suites: \n";
-	cerr << rFailure << endl;
-	wasSucessful = false;
-    }
-    return !wasSucessful;
+  bool wasSucessful;
+  try {
+    wasSucessful = runner.run("", false);
+  } catch (string &rFailure) {
+    cerr << "Caught a string exception from test suites: \n";
+    cerr << rFailure << endl;
+    wasSucessful = false;
+  }
+  return !wasSucessful;
 }
 
 namespace DAQ {
-    namespace V8 {
-	std::size_t gBufferSize = 8192;
-    }
+namespace V8 {
+std::size_t gBufferSize = 8192;
 }
+} // namespace DAQ
 
 int gpTCLApplication = 0;
