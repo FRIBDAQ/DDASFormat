@@ -264,7 +264,7 @@ public:
 
   /** @brief Read revision from module idntifier word for 250 MSPS. */
   void revision_250() {
-    EQMSG("250 MSPS extract hardware revision", 15,
+    EQMSG("250 MSPS extract hardware revision", uint16_t(15),
           hit250.getHardwareRevision());
   }
 
@@ -273,7 +273,7 @@ public:
    * for 16-bit 250 MSPS.
    */
   void resolution_250() {
-    EQMSG("250 MSPS extract ADC resolution", 16, hit250.getADCResolution());
+    EQMSG("250 MSPS extract ADC resolution", uint16_t(16), hit250.getADCResolution());
   }
 
   /** @brief Read coarse time from 250 MSPS module. */
@@ -316,7 +316,7 @@ public:
 
   /** @brief Read revision from module idntifier word for 500 MSPS. */
   void revision_500() {
-    EQMSG("500 MSPS extract hardware revision", 15,
+    EQMSG("500 MSPS extract hardware revision", uint16_t(15),
           hit500.getHardwareRevision());
   }
 
@@ -325,7 +325,7 @@ public:
    * for 16-bit 500 MSPS.
    */
   void resolution_500() {
-    EQMSG("500 MSPS extract ADC resolution", 14, hit500.getADCResolution());
+    EQMSG("500 MSPS extract ADC resolution", uint16_t(14), hit500.getADCResolution());
   }
 
   /** @brief Read coarse time from 500 MSPS module. */
@@ -448,7 +448,7 @@ public:
 
   /** @brief Check the module revision value is correctly parsed for Rev. H. */
   void revision_revH() {
-    EQMSG("Rev. H extract revision", uint32_t(17), hitRevH.getHardwareRevision());
+    EQMSG("Rev. H extract revision", uint16_t(17), hitRevH.getHardwareRevision());
   }
 
   /** @brief Check the crate ID value is correctly parsed for Rev. H. */

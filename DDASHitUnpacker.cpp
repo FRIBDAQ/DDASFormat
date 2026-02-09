@@ -91,25 +91,19 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
   if (extraWords) {
     if (extraWords == SIZE_OF_EXT_TS) {
       data = extractExternalTimestamp(data, hit);
-
     } else if (extraWords == SIZE_OF_ENE_SUMS) {
       data = extractEnergySums(data, hit);
-
     } else if (extraWords == (SIZE_OF_ENE_SUMS + SIZE_OF_EXT_TS)) {
       data = extractEnergySums(data, hit);
       data = extractExternalTimestamp(data, hit);
-
     } else if (extraWords == SIZE_OF_QDC_SUMS) {
       data = extractQDC(data, hit);
-
     } else if (extraWords == (SIZE_OF_QDC_SUMS + SIZE_OF_EXT_TS)) {
       data = extractQDC(data, hit);
       data = extractExternalTimestamp(data, hit);
-
     } else if (extraWords == (SIZE_OF_ENE_SUMS + SIZE_OF_QDC_SUMS)) {
       data = extractEnergySums(data, hit);
       data = extractQDC(data, hit);
-
     } else if (extraWords ==
                (SIZE_OF_ENE_SUMS + SIZE_OF_QDC_SUMS + SIZE_OF_EXT_TS)) {
       data = extractEnergySums(data, hit);

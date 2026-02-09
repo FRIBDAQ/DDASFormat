@@ -77,92 +77,8 @@ void ddasfmt::DDASHit::Reset() {
   m_trace.clear();
 }
 
-/**
- * @brief Destructor.
- */
-ddasfmt::DDASHit::~DDASHit() {}
-
-void ddasfmt::DDASHit::setChannelID(uint32_t channel) { m_chanID = channel; }
-
-void ddasfmt::DDASHit::setSlotID(uint32_t slot) { m_slotID = slot; }
-
-void ddasfmt::DDASHit::setCrateID(uint32_t crate) { m_crateID = crate; }
-
-void ddasfmt::DDASHit::setChannelHeaderLength(uint32_t channelHeaderLength) {
-  m_channelHeaderLength = channelHeaderLength;
-}
-
-void ddasfmt::DDASHit::setChannelLength(uint32_t channelLength) {
-  m_channelLength = channelLength;
-}
-
-void ddasfmt::DDASHit::setFinishCode(bool finishCode) {
-  m_finishCode = finishCode;
-}
-
-/**
- * @details
- * Latching of the coarse timestamp depends on whether or not the
- * CFD is enabled, and, if enabled, whether the CFD algorithm
- * succeeds or not:
- * - If the CFD is enabled and a vaild CFD exists, the coarse
- *   timestamp is latched to the trace sample immidiately prior
- *   to the zero-crossing point.
- * - If the CFD is enabled and fails, the coarse timestamp is
- *   latched to the leading-edge trigger point.
- * - If the CFD is disabled, the coarse timestamp is latched to
- *   the leading-edge trigger point.
- */
-void ddasfmt::DDASHit::setCoarseTime(uint64_t time) { m_coarseTime = time; }
-
-void ddasfmt::DDASHit::setRawCFDTime(uint32_t data) { m_timeCFD = data; }
-
-/**
- * @details
- * The 250 MSPS and 500 MSPS modules de-serialize data into an FPGA
- * which operates at some fraction of the ADC sampling rate. The CFD
- * trigger source bit specifies which fractional time offset from the
- * FPGA clock tick the CFD zero-crossing occured. For 100 MSPS modules,
- * the source bit is always equal to 0 (FPGA captures data also at
- * 100 MSPS).
- */
-void ddasfmt::DDASHit::setCFDTrigSourceBit(uint32_t bit) {
-  m_cfdTrigSourceBit = bit;
-}
-
-/**
- * @details
- * The CFD fail bit == 1 if the CFD algorithm fails. The CFD can fail
- * if the threshold value is too high or the CFD algorithm fails to
- * find a zero-crossing point within 32 samples of the leading-edge
- * trigger point.
- */
-void ddasfmt::DDASHit::setCFDFailBit(uint32_t bit) { m_cfdFailBit = bit; }
-
-void ddasfmt::DDASHit::setTimeLow(uint32_t datum) { m_timeLow = datum; }
-
 void ddasfmt::DDASHit::setTimeHigh(uint32_t datum) {
   m_timeHigh = datum & LOWER_16_BIT_MASK;
-}
-
-void ddasfmt::DDASHit::setTime(double compTime) { m_time = compTime; }
-
-void ddasfmt::DDASHit::setEnergy(uint32_t energy) { m_energy = energy; }
-
-void ddasfmt::DDASHit::setTraceLength(uint32_t length) {
-  m_traceLength = length;
-}
-
-void ddasfmt::DDASHit::setModMSPS(uint32_t msps) { m_modMSPS = msps; }
-
-void ddasfmt::DDASHit::setADCResolution(int value) { m_adcResolution = value; }
-
-void ddasfmt::DDASHit::setHardwareRevision(int value) {
-  m_hdwrRevision = value;
-}
-
-void ddasfmt::DDASHit::appendEnergySum(uint32_t value) {
-  m_energySums.push_back(value);
 }
 
 void ddasfmt::DDASHit::setEnergySums(std::vector<uint32_t> eneSums) {
@@ -176,10 +92,6 @@ void ddasfmt::DDASHit::setEnergySums(std::vector<uint32_t> eneSums) {
   m_energySums = eneSums;
 }
 
-void ddasfmt::DDASHit::appendQDCSum(uint32_t value) {
-  m_qdcSums.push_back(value);
-}
-
 void ddasfmt::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums) {
   if (qdcSums.size() != SIZE_OF_QDC_SUMS) {
     std::string msg("Error setting QDC sums: Expected ");
@@ -189,21 +101,4 @@ void ddasfmt::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums) {
     throw std::runtime_error(msg);
   }
   m_qdcSums = qdcSums;
-}
-
-void ddasfmt::DDASHit::appendTraceSample(uint16_t value) {
-  m_trace.push_back(value);
-}
-
-void ddasfmt::DDASHit::setTrace(std::vector<uint16_t> trace) {
-  m_trace = trace;
-  setTraceLength(m_trace.size());
-}
-
-void ddasfmt::DDASHit::setExternalTimestamp(uint64_t value) {
-  m_externalTimestamp = value;
-}
-
-void ddasfmt::DDASHit::setADCOverflowUnderflow(bool state) {
-  m_adcOverflowUnderflow = state;
 }

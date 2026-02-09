@@ -95,8 +95,8 @@ private:
   uint32_t m_cfdFailBit;          //!< Indicates whether the CFD failed.
   uint32_t m_traceLength;         //!< Length of stored trace.
   uint32_t m_modMSPS;             //!< Sampling rate of the module (MSPS).
-  int m_hdwrRevision;             //!< Hardware revision.
-  int m_adcResolution;            //!< ADC resolution.
+  uint16_t m_hdwrRevision;        //!< Hardware revision.
+  uint16_t m_adcResolution;       //!< ADC resolution.
   bool m_adcOverflowUnderflow;    //!< =1 if over- or under-flow.
 
   // Storage for extra data which may be present in a hit:
@@ -115,7 +115,7 @@ public:
    * The destrutor is virtual to ensure proper destruction of
    * objects derived from DDASHit.
    */
-  virtual ~DDASHit();
+  virtual ~DDASHit() {};
   /**
    * @brief Resets the state of all member data to that of
    * initialization
@@ -240,12 +240,12 @@ public:
    * @brief Retrieve the hardware revision.
    * @return int  Module hardware revision number.
    */
-  int getHardwareRevision() const { return m_hdwrRevision; }
+  uint16_t getHardwareRevision() const { return m_hdwrRevision; }
   /**
    * @brief Retrieve the ADC resolution.
    * @return Module ADC resolution (bit depth).
    */
-  int getADCResolution() const { return m_adcResolution; }
+  uint16_t getADCResolution() const { return m_adcResolution; }
   /**
    * @brief Retrieve trigger source bit from CFD data.
    * @return The CFD trigger source bit.
@@ -310,62 +310,91 @@ public:
    * @brief Set the channel ID.
    * @param channel Channel value for this hit.
    */
-  void setChannelID(uint32_t channel);
+  void setChannelID(uint32_t channel) { m_chanID = channel; }
   /**
    * @brief Set the slot ID.
    * @param slot Slot value for this hit.
    */
-  void setSlotID(uint32_t slot);
+  void setSlotID(uint32_t slot) { m_slotID = slot; }
   /**
    * @brief Set the crate ID.
    * @param crate Crate ID value for this hit.
    */
-  void setCrateID(uint32_t crate);
+  void setCrateID(uint32_t crate) { m_crateID = crate; }
   /**
    * @brief Set the channel header length
    * @param channelHeaderLength Channel header length of this hit.
    */
-  void setChannelHeaderLength(uint32_t channelHeaderLength);
+  void setChannelHeaderLength(uint32_t channelHeaderLength) {
+    m_channelHeaderLength = channelHeaderLength;
+  }
   /**
    * @brief Set the channel length.
    * @param channelLength The length of the hit.
    */
-  void setChannelLength(uint32_t channelLength);
+  void setChannelLength(uint32_t channelLength) {
+    m_channelLength = channelLength;
+  }
   /**
    * @brief Set the finish code.
    * @param finishCode Finish code for this hit.
    */
-  void setFinishCode(bool finishCode);
+  void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
   /**
-   * @brief Set the coarse timestamp.
-   * @param time The coarse timestamp.
+   * @brief Set the finish code.
+   * @param finishCode Finish code for this hit.
+   * @details
+   * Latching of the coarse timestamp depends on whether or not the
+   * CFD is enabled, and, if enabled, whether the CFD algorithm
+   * succeeds or not:
+   * - If the CFD is enabled and a vaild CFD exists, the coarse
+   *   timestamp is latched to the trace sample immidiately prior
+   *   to the zero-crossing point.
+   * - If the CFD is enabled and fails, the coarse timestamp is
+   *   latched to the leading-edge trigger point.
+   * - If the CFD is disabled, the coarse timestamp is latched to
+   *   the leading-edge trigger point.
    */
-  void setCoarseTime(uint64_t time);
+  void setCoarseTime(uint64_t time) { m_coarseTime = time; }
   /**
    * @brief Set the raw CFD time.
    * @param data The raw CFD value from the data word.
    */
-  void setRawCFDTime(uint32_t data);
+  void setRawCFDTime(uint32_t data) { m_timeCFD = data; }
+
   /**
    * @brief Set the CFD trigger source bit.
    * @param bit The CFD trigger source bit value for this hit.
+   * @details
+   * The 250 MSPS and 500 MSPS modules de-serialize data into an FPGA
+   * which operates at some fraction of the ADC sampling rate. The CFD
+   * trigger source bit specifies which fractional time offset from the
+   * FPGA clock tick the CFD zero-crossing occured. For 100 MSPS modules,
+   * the source bit is always equal to 0 (FPGA captures data also at
+   * 100 MSPS).
    */
-  void setCFDTrigSourceBit(uint32_t bit);
+  void setCFDTrigSourceBit(uint32_t bit) { m_cfdTrigSourceBit = bit; }
+
   /**
    * @brief Set the CFD fail bit.
    * @param bit The CFD fail bit value.
+   * @details
+   * The CFD fail bit == 1 if the CFD algorithm fails. The CFD can fail
+   * if the threshold value is too high or the CFD algorithm fails to
+   * find a zero-crossing point within 32 samples of the leading-edge
+   * trigger point.
    */
-  void setCFDFailBit(uint32_t bit);
+  void setCFDFailBit(uint32_t bit) { m_cfdFailBit = bit; }
   /**
    * @brief Set the lower 32 bits of the 48-bit timestamp.
-   * @param datum  The lower 32 bits of the timestamp.
+   * @param datum The lower 32 bits of the timestamp.
    */
-  void setTimeLow(uint32_t datum);
+  void setTimeLow(uint32_t datum) { m_timeLow = datum; }
   /**
    * @brief Set the higher 16 bits of the 48-bit timestamp.
    * @param datum The higher 16 bits of the 48-bit timestamp
-   *   extracted from the lower 16 bits of the 32-bit word passed to
-   *   this function.
+   * extracted from the lower 16 bits of the 32-bit word passed to
+   * this function.
    */
   void setTimeHigh(uint32_t datum);
   /**
@@ -373,40 +402,40 @@ public:
    * @param compTime The computed time for this hit with the CFD
    *   correction applied.
    */
-  void setTime(double compTime);
+  void setTime(double compTime) { m_time = compTime; }
   /**
    * @brief Set the energy for this hit.
    * @param energy The energy for this hit.
    */
-  void setEnergy(uint32_t energy);
+  void setEnergy(uint32_t energy) { m_energy = energy; }
   /**
    * @brief Set the ADC trace length.
    * @param length The length of the trace in 16-bit words (samples).
    */
-  void setTraceLength(uint32_t length);
+  void setTraceLength(uint32_t length) { m_traceLength = length; }
   /**
    * @brief Set the value of the ADC frequency in MSPS for the ADC
    * which recorded this hit.
    * @param msps The ADC frequency in MSPS.
    */
-  void setModMSPS(uint32_t msps);
+  void setModMSPS(uint32_t msps) { m_modMSPS = msps; }
   /**
    * @brief Set the value of the ADC resolution (bit depth) for the
    * ADC which recorded this hit.
    * @param value The ADC resolution.
    */
-  void setADCResolution(int value);
+  void setADCResolution(uint16_t value) { m_adcResolution = value; }
   /**
    * @brief Set the ADC hardware revision for the ADC which recorded
    * this hit.
    * @param value The hardware revision of the ADC.
    */
-  void setHardwareRevision(int value);
+  void setHardwareRevision(uint16_t value) { m_hdwrRevision = value; }
   /**
-   * @brief Set the crate ID.
-   * @param value Crate ID value for this hit.
+   * @brief Append energy sum value to the vector of energy sums.
+   * @param value Energy sum value appended to the vector.
    */
-  void appendEnergySum(uint32_t value);
+  void appendEnergySum(uint32_t value) { m_energySums.push_back(value); }
   /**
    * @brief Set the energy sum data from an existing set of sums.
    * @param eneSums Vector of energy sums.
@@ -416,7 +445,7 @@ public:
    * @brief Append a QDC value to the vector of QDC sums.
    * @param value  The QDC value appended to the vector.
    */
-  void appendQDCSum(uint32_t value);
+  void appendQDCSum(uint32_t value) { m_qdcSums.push_back(value); }
   /**
    * @brief Set the QDC sum data from an existing set of sums.
    * @param qdcSums Vector of QDC sums.
@@ -426,24 +455,27 @@ public:
    * @brief Append a 16-bit ADC trace sample to the trace vector.
    * @param value The 16-bit ADC sample appended to the vector.
    */
-  void appendTraceSample(uint16_t value);
+  void appendTraceSample(uint16_t value) { m_trace.push_back(value); }
   /**
    * @brief Set the trace data from an existing trace.
    * @param trace The trace.
    */
-  void setTrace(std::vector<uint16_t> trace);
+  void setTrace(std::vector<uint16_t> trace) {
+    m_trace = trace;
+    setTraceLength(m_trace.size());
+  }
   /**
    * @brief Set the value of the external timestamp.
    * @param value The value of the external timestamp supplied
    *   to DDAS. in clock ticks.
    */
-  void setExternalTimestamp(uint64_t value);
+  void setExternalTimestamp(uint64_t value) { m_externalTimestamp = value; }
   /**
    * @brief Set ADC over- or under-flow state.
    * @param state The ADC under-/overflow state. True if the ADC
    *   under- or overflows the ADC.
    */
-  void setADCOverflowUnderflow(bool state);
+  void setADCOverflowUnderflow(bool state) { m_adcOverflowUnderflow = state; }
 };
 
 /** @} */
