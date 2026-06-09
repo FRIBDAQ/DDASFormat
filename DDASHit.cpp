@@ -23,6 +23,7 @@
 
 #include "DDASHit.h"
 
+#include <algorithm>
 #include <stdlib.h>
 
 #include <iomanip>
@@ -89,7 +90,7 @@ void ddasfmt::DDASHit::setEnergySums(std::vector<uint32_t> eneSums) {
     msg += std::to_string(eneSums.size());
     throw std::runtime_error(msg);
   }
-  m_energySums = eneSums;
+  m_energySums = std::move(eneSums);
 }
 
 void ddasfmt::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums) {
@@ -100,5 +101,5 @@ void ddasfmt::DDASHit::setQDCSums(std::vector<uint32_t> qdcSums) {
     msg += std::to_string(qdcSums.size());
     throw std::runtime_error(msg);
   }
-  m_qdcSums = qdcSums;
+  m_qdcSums = std::move(qdcSums);
 }
