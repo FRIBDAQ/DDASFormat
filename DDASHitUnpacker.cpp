@@ -451,8 +451,8 @@ const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
 const uint32_t *
 ddasfmt::DDASHitUnpacker::extractExternalTimestamp(const uint32_t *data,
                                                    DDASHit &hit) {
-  uint32_t low = *data++;
-  uint32_t high = *data++ & LOWER_16_BIT_MASK;
+  uint32_t low = *data++;                      // Lower 32 bits.
+  uint32_t high = *data++ & LOWER_16_BIT_MASK; // Defensive (upper bits are 0).
   uint64_t timestamp = (static_cast<uint64_t>(high) << 32) | low;
   hit.setExternalTimestamp(timestamp);
 

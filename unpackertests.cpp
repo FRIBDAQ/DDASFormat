@@ -404,7 +404,7 @@ public:
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted when no QDC or energy sums",
-          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
+          uint64_t(0xabcd76543210), hit.getExternalTimestamp());
   }
 
   /**
@@ -422,7 +422,7 @@ public:
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted with energy sums and no QDC",
-          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
+          uint64_t(0xabcd76543210), hit.getExternalTimestamp());
   }
 
   /**
@@ -441,7 +441,7 @@ public:
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted with QDC and no energy sums",
-          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
+          uint64_t(0xabcd76543210), hit.getExternalTimestamp());
   }
 
   //_______________________________________________________________________
