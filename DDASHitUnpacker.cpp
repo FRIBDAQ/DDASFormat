@@ -351,7 +351,9 @@ ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data) {
  */
 double ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit &hit,
                                                     uint32_t data) {
-  auto [correction, timeCFD, cfdTrigSource, cfdFailBit] =
+  double correction;
+  uint32_t cfdTrigSource, cfdFailBit, timeCFD;
+  std::tie(correction, timeCFD, cfdTrigSource, cfdFailBit) =
       parseAndComputeCFD(hit.getModMSPS(), data);
   hit.setCFDFailBit(cfdFailBit);
   hit.setCFDTrigSourceBit(cfdTrigSource);
