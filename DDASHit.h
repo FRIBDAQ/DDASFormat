@@ -341,8 +341,8 @@ public:
    */
   void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
   /**
-   * @brief Set the finish code.
-   * @param finishCode Finish code for this hit.
+   * @brief Set the coarse timestamp (timestamp without CFD correction).
+   * @param time The coarse timestamp for this hit.
    * @details
    * Latching of the coarse timestamp depends on whether or not the
    * CFD is enabled, and, if enabled, whether the CFD algorithm
