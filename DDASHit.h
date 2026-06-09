@@ -461,7 +461,7 @@ public:
    * @param trace The trace.
    */
   void setTrace(std::vector<uint16_t> trace) {
-    m_trace = trace;
+    m_trace = std::move(trace);
     setTraceLength(m_trace.size());
   }
   /**

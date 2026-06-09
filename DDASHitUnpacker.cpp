@@ -47,10 +47,7 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
                                                  const uint32_t *sentinel,
                                                  DDASHit &hit) {
   if (beg == sentinel) {
-    std::stringstream errmsg;
-    errmsg << "DDASHitUnpacker::unpack() ";
-    errmsg << "Unable to parse empty data buffer.";
-    throw std::runtime_error(errmsg.str());
+    throw std::runtime_error("ERROR: Unable to parse empty data buffer.");
   }
 
   const uint32_t *data = beg;
@@ -61,15 +58,21 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
   data = parseHeaderWords1And2(hit, data);
   data = parseHeaderWord3(hit, data);
 
-  // Finished upacking the minimum set of data:
+  // Finished unpacking the minimum set of data:
 
   uint32_t channelHeaderLength = hit.getChannelHeaderLength();
   uint32_t channellength = hit.getChannelLength();
   size_t tracelength = hit.getTraceLength();
 
-  // We may have more data to unpack:
+  // We may have more data to unpack. Note that individual trace words are
+  // uint16_t, so for tracelength in units of trace samples, we need to divide
+  // by sizeof(uint16_t) to get the number of 32-bit words in the trace data.
+  // The total number of 32-bit words in the event should be equal to the
+  // channel header length plus the number of 32-bit words in the trace data. If
+  // this is not the case, then there is a data corruption issue and we throw an
+  // error.
 
-  if (channellength != (channelHeaderLength + tracelength / 2)) {
+  if (channellength != (channelHeaderLength + tracelength / sizeof(uint16_t))) {
     std::stringstream errmsg;
     errmsg << "ERROR: Data corruption: ";
     errmsg << "Inconsistent data lengths found in header ";
@@ -109,6 +112,12 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
       data = extractEnergySums(data, hit);
       data = extractQDC(data, hit);
       data = extractExternalTimestamp(data, hit);
+    } else {
+      std::stringstream errmsg;
+      errmsg << "ERROR: Data corruption: Unexpected number of extra words "
+             << "in header.\nExpected 0, 2, 4, 6, 8, 10, 12, or 14 but found "
+             << extraWords << ".";
+      throw std::runtime_error(errmsg.str());
     }
   }
 
@@ -129,8 +138,8 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
  * determine when the parsing is complete.
  *
  * While it parses, it stores the results into the data members of the object
- * hit. Prior to parsing, all data members are reset to 0 using the Reset()
- * method.
+ * hit. All member data is zero-initialized prior to parsing using the default
+ * constructor of DDASHit.
  */
 std::tuple<ddasfmt::DDASHit, const uint32_t *>
 ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
@@ -149,8 +158,9 @@ const uint32_t *
 ddasfmt::DDASHitUnpacker::parseBodySize(const uint32_t *data,
                                         const uint32_t *sentinel) {
   uint32_t nShorts = *data;
-  // Make sure there is enough data to parse
-  if ((data + nShorts / sizeof(uint16_t) > sentinel) && (sentinel != nullptr)) {
+  // Make sure there is enough data to parse. Convert the number of 16-bit words
+  // to the number of 32-bit words and check against the sentinel.
+  if ((sentinel != nullptr) && (data + nShorts / sizeof(uint16_t) > sentinel)) {
     throw std::runtime_error(
         "DDASHitUnpacker::parseBodySize() found incomplete event data!");
   }
@@ -179,13 +189,11 @@ ddasfmt::DDASHitUnpacker::parseModuleInfo(DDASHit &hit, const uint32_t *data) {
  * - Crate/slot/channel information,
  * - The header and channel lengths in 32-bit words,
  * - The module finish code (equals 1 if piled up).
- *
  * @note In previous versions of the Pixie data format, the ADC out-of-range
  * bit was stored in bit 30 of word 0 and the channel length was extracted
  * from bits [17:29]. In the current data format, the out-of-range flag has
  * been moved to word 3, bit 31, and the channel length mask is extracted
  * from bits [17:30] allowing up to 16383 32-bit words per channel hit.
- *
  * @note In hardware revision H, the crate/slot/channel information is stored
  * differently in word 0. The channel ID is stored in bits [5:0], the slot ID is
  * stored in bits [9:6], and the crate ID is stored in bits [11:10]. The
@@ -198,7 +206,7 @@ ddasfmt::DDASHitUnpacker::parseHeaderWord0(DDASHit &hit, const uint32_t *data) {
   uint32_t datum = *data++;
 
   // Read the module revision to determine how to parse the crate/slot/channel
-  // info. Rev. H is 0x11 = 17 in decimal. We assume if its not Rev. H it
+  // info. Rev. H is 0x11 = 17 in decimal. We assume if it's not Rev. H it
   // follows the original format.
   if (hit.getHardwareRevision() == 17) {
     hit.setChannelID(datum & CHANNEL_ID_MASK_REV_H);
@@ -221,7 +229,7 @@ ddasfmt::DDASHitUnpacker::parseHeaderWord0(DDASHit &hit, const uint32_t *data) {
  * @details
  * Words 1 and 2 contain the timestamp and CFD information. The meaning of the
  * CFD word depends on the module type. The unpacker abstracts this meaning
- * away from the user. Note that we know the module type  if the module
+ * away from the user. Note that we know the module type if the module
  * identifier word was unpacked before calling this function.
  *
  * Word 1 contains:
@@ -234,15 +242,17 @@ const uint32_t *
 ddasfmt::DDASHitUnpacker::parseHeaderWords1And2(DDASHit &hit,
                                                 const uint32_t *data) {
   uint32_t timeLow = *data++;
-  uint32_t datum1 = *data++;
-  uint32_t timeHigh = datum1 & LOWER_16_BIT_MASK;
-  uint32_t adcFrequency = hit.getModMSPS();
-
-  uint64_t coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh);
-  double cfdCorrection = parseAndComputeCFD(hit, datum1);
+  uint32_t word2 = *data++;
+  uint32_t timeHigh = word2 & LOWER_16_BIT_MASK;
 
   hit.setTimeLow(timeLow);
   hit.setTimeHigh(timeHigh);
+
+  uint32_t adcFrequency = hit.getModMSPS();
+  uint64_t coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh);
+  double cfdCorrection =
+      parseAndComputeCFD(hit, word2); // Also sets CFD bits in hit.
+
   hit.setCoarseTime(coarseTime);
   hit.setTime(static_cast<double>(coarseTime) + cfdCorrection);
 
@@ -255,7 +265,6 @@ ddasfmt::DDASHitUnpacker::parseHeaderWords1And2(DDASHit &hit,
  * - The trace out-of-range (overflow/underflow) flag,
  * - The trace length in samples (16-bit words),
  * - The hit energy.
- *
  * @note In the current Pixie list mode data format, the ADC out-of-range flag
  * is stored in word 3, bit 31 rather than word 0, bit 30. See documentation
  * for `parseHeaderWord0()` for more info.
@@ -278,14 +287,17 @@ ddasfmt::DDASHitUnpacker::parseHeaderWord3(DDASHit &hit, const uint32_t *data) {
  */
 const uint32_t *ddasfmt::DDASHitUnpacker::parseTraceData(DDASHit &hit,
                                                          const uint32_t *data) {
-  std::vector<uint16_t> &trace = hit.getTrace();
-  size_t tracelength = hit.getTraceLength();
+  size_t tracelength = hit.getTraceLength(); // Samples.
+  size_t tracewords =
+      tracelength / sizeof(uint16_t); // 32-bit words of trace data.
+  std::vector<uint16_t> trace;
   trace.reserve(tracelength);
-  for (size_t i = 0; i < tracelength / 2; i++) {
+  for (size_t i = 0; i < tracewords; i++) {
     uint32_t datum = *data++;
     trace.push_back(datum & LOWER_16_BIT_MASK);
     trace.push_back((datum & UPPER_16_BIT_MASK) >> 16);
   }
+  hit.setTrace(std::move(trace));
 
   return data;
 }
@@ -321,6 +333,11 @@ ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data) {
     timeCFD = ((data & BIT_28_TO_16_MASK) >> 16);
     correction = (timeCFD / 8192.0 + cfdTrigSource - 1) * 2.0;
     cfdFailBit = (cfdTrigSource == 7) ? 1 : 0;
+  } else {
+    throw std::runtime_error("DDASHitUnpacker::parseAndComputeCFD(): Invalid "
+                             "module ADC frequency: " +
+                             std::to_string(ModMSPS) +
+                             " MSPS. Expected 100, 250, or 500 MSPS.");
   }
 
   return std::make_tuple(correction, timeCFD, cfdTrigSource, cfdFailBit);
@@ -334,31 +351,8 @@ ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data) {
  */
 double ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit &hit,
                                                     uint32_t data) {
-  double correction;
-  uint32_t cfdTrigSource, cfdFailBit, timeCFD;
-  uint32_t ModMSPS = hit.getModMSPS();
-
-  // check on the module MSPS and pick the correct CFD unpacking algorithm
-  if (ModMSPS == 100) {
-    // 100 MSPS modules don't have trigger source bits
-    cfdFailBit = ((data & BIT_31_MASK) >> 31);
-    cfdTrigSource = 0;
-    timeCFD = ((data & BIT_30_TO_16_MASK) >> 16);
-    correction = (timeCFD / 32768.0) * 10.0; // 32768 = 2^15
-  } else if (ModMSPS == 250) {
-    // CFD fail bit in bit 31
-    cfdFailBit = ((data & BIT_31_MASK) >> 31);
-    cfdTrigSource = ((data & BIT_30_MASK) >> 30);
-    timeCFD = ((data & BIT_29_TO_16_MASK) >> 16);
-    correction = (timeCFD / 16384.0 - cfdTrigSource) * 4.0;
-  } else if (ModMSPS == 500) {
-    // no fail bit in 500 MSPS modules
-    cfdTrigSource = ((data & BIT_31_TO_29_MASK) >> 29);
-    timeCFD = ((data & BIT_28_TO_16_MASK) >> 16);
-    correction = (timeCFD / 8192.0 + cfdTrigSource - 1) * 2.0;
-    cfdFailBit = (cfdTrigSource == 7) ? 1 : 0;
-  }
-
+  auto [correction, timeCFD, cfdTrigSource, cfdFailBit] =
+      parseAndComputeCFD(hit.getModMSPS(), data);
   hit.setCFDFailBit(cfdFailBit);
   hit.setCFDTrigSourceBit(cfdTrigSource);
   hit.setRawCFDTime(timeCFD);
@@ -373,17 +367,17 @@ double ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit &hit,
  *
  * The calculations for the various modules are as follows:
  *
- * For the 100 MSPS module:
+ * For the 100 MSPS module (100 MHz timestamping clock):
  *
  * \f[\text{time} = 10\times((\text{timeHigh} << 32)
  * + \text{timeLow})\f]
  *
- * For the 250 MSPS module...
+ * For the 250 MSPS module (125 MHz):
  *
  * \f[\text{time} = 8\times((\text{timeHigh} << 32)
  * + \text{timeLow})\f]
  *
- * For the 500 MSPS module,
+ * For the 500 MSPS module (100 MHz):
  *
  * \f[\text{time} = 10\times((\text{timeHigh} << 32)
  * + \text{timeLow})\f]
@@ -391,53 +385,52 @@ double ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit &hit,
 uint64_t ddasfmt::DDASHitUnpacker::computeCoarseTime(uint32_t adcFrequency,
                                                      uint32_t timeLow,
                                                      uint32_t timeHigh) {
-  uint64_t tstamp = timeHigh;
-  tstamp = tstamp << 32;
-  tstamp |= timeLow;
+  uint64_t timestamp = (static_cast<uint64_t>(timeHigh) << 32) | timeLow;
 
   // Conversion to units of real time depends on module type:
 
-  uint64_t toNanoseconds = 10;
-  if (adcFrequency == 250) {
+  uint64_t toNanoseconds;
+  if (adcFrequency == 100 || adcFrequency == 500) {
+    toNanoseconds = 10;
+  } else if (adcFrequency == 250) {
     toNanoseconds = 8;
+  } else {
+    throw std::runtime_error("DDASHitUnpacker::computeCoarseTime(): Invalid "
+                             "module ADC frequency: " +
+                             std::to_string(adcFrequency) +
+                             " MSPS. Expected 100, 250, or 500 MSPS.");
   }
 
-  return tstamp * toNanoseconds;
+  return timestamp * toNanoseconds;
 }
 
 /**
  * @details
  * Energy sums consist of SIZE_OF_ENE_SUMS (=4) 32-bit words, which are,
  * in order:
- * 0. The trailing (pre-gap ) sum.
+ * 0. The trailing (pre-gap) sum.
  * 1. The gap sum.
  * 2. The leading (post-gap) sum.
  * 3. The 32-bit IEEE 754 floating point baseline value.
- *
- * If the hit is not reset between calls to this function, the energy sum
- * data will be appended to the end of the exisiting energy sums.
+ * Each call to this function overwrites any previous energy sum data stored in
+ * the hit.
  */
 const uint32_t *
 ddasfmt::DDASHitUnpacker::extractEnergySums(const uint32_t *data,
                                             DDASHit &hit) {
-  std::vector<uint32_t> &energies = hit.getEnergySums();
-  energies.reserve(SIZE_OF_ENE_SUMS);
-  energies.insert(energies.end(), data, data + SIZE_OF_ENE_SUMS);
+  hit.setEnergySums({data, data + SIZE_OF_ENE_SUMS});
 
   return data + SIZE_OF_ENE_SUMS;
 }
 
 /**
  * @details
- * QDC sums consist of SIZE_OF_QDC_SUMS (=8) 32-bit words. If the hit is not
- * reset between calls to this function, the QDC sum data will be appended
- * to the end of the exisiting QDC sums.
+ * QDC sums consist of SIZE_OF_QDC_SUMS (=8) 32-bit words. Each call overwrites
+ * any previous QDC sum data stored in the hit.
  */
 const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
                                                      DDASHit &hit) {
-  std::vector<uint32_t> &qdcVals = hit.getQDCSums();
-  qdcVals.reserve(SIZE_OF_QDC_SUMS);
-  qdcVals.insert(qdcVals.end(), data, data + SIZE_OF_QDC_SUMS);
+  hit.setQDCSums({data, data + SIZE_OF_QDC_SUMS});
 
   return data + SIZE_OF_QDC_SUMS;
 }
@@ -452,11 +445,10 @@ const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
 const uint32_t *
 ddasfmt::DDASHitUnpacker::extractExternalTimestamp(const uint32_t *data,
                                                    DDASHit &hit) {
-  uint64_t tstamp = 0;
-  uint32_t temp = *data++;
-  tstamp = *data++;                 // Lower 32 bits.
-  tstamp = ((tstamp << 32) | temp); // Shift upper 32 bits and OR.
-  hit.setExternalTimestamp(tstamp);
+  uint32_t low = *data++;  // Lower 32 bits.
+  uint32_t high = *data++; // Upper 16 bits in lower 16 bits of the word.
+  uint64_t timestamp = (static_cast<uint64_t>(high) << 32) | low;
+  hit.setExternalTimestamp(timestamp);
 
   return data;
 }
