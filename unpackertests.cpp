@@ -122,7 +122,7 @@ public:
     data = {0x00000030, 0x0c0c0064, 0x002d2321, 0x0000f687, 0x947f000a,
             0x000808be, 0x00000001, 0x00000002, 0x00000003, 0x00000004,
             0x00000005, 0x00000006, 0x00000007, 0x00000008, 0x00000009,
-            0x0000000a, 0x0000000b, 0x0000000c, 0x0a0a0b0b, 0x0c0c0d0d,
+            0x0000000a, 0x0000000b, 0x0000000c, 0x76543210, 0x0000abcd,
             0x00020001, 0x00040003, 0x00060005, 0x00080007};
     std::tie(hit100, std::ignore) =
         unpacker.unpack(data.data(), data.data() + data.size());
@@ -244,7 +244,7 @@ public:
   /** @brief Read the QDC sums. */
   void qdcSums_100() {
     std::vector<uint32_t> expected = {5, 6, 7, 8, 9, 10, 11, 12};
-    EQMSG("Found all 4 energy sums", expected, hit100.getQDCSums());
+    EQMSG("Found all 8 QDC sums", expected, hit100.getQDCSums());
   }
 
   /** @brief Read trace data. */
@@ -273,7 +273,8 @@ public:
    * for 16-bit 250 MSPS.
    */
   void resolution_250() {
-    EQMSG("250 MSPS extract ADC resolution", uint16_t(16), hit250.getADCResolution());
+    EQMSG("250 MSPS extract ADC resolution", uint16_t(16),
+          hit250.getADCResolution());
   }
 
   /** @brief Read coarse time from 250 MSPS module. */
@@ -325,7 +326,8 @@ public:
    * for 16-bit 500 MSPS.
    */
   void resolution_500() {
-    EQMSG("500 MSPS extract ADC resolution", uint16_t(14), hit500.getADCResolution());
+    EQMSG("500 MSPS extract ADC resolution", uint16_t(14),
+          hit500.getADCResolution());
   }
 
   /** @brief Read coarse time from 500 MSPS module. */
@@ -382,7 +384,7 @@ public:
    * sums and energy sums are enabled.
    */
   void externalClock_0() {
-    uint64_t expected = 0xc0c0d0d0a0a0b0b;
+    uint64_t expected = 0xabcd76543210;
     EQMSG("Timestamp extracted with QDC and energy sums", expected,
           hit100.getExternalTimestamp());
   }
@@ -395,14 +397,14 @@ public:
     // Header words == 6.
     std::vector<uint32_t> data = {0x0000000e, 0x0c0c0064, 0x000c6000,
                                   0x139f2709, 0x28170000, 0x00007fff,
-                                  0x40302010, 0x00a00a00};
+                                  0x76543210, 0x0000abcd};
 
     DDASHit hit;
     DDASHitUnpacker unpacker;
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted when no QDC or energy sums",
-          uint64_t(0x00a00a0040302010), hit.getExternalTimestamp());
+          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
   }
 
   /**
@@ -413,14 +415,14 @@ public:
     // Header words == 10.
     std::vector<uint32_t> data = {
         0x0000000e, 0x0c0c0064, 0x0014a000, 0x139f2709, 0x28170000, 0x00007fff,
-        0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x40302010, 0x00a00a00};
+        0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x76543210, 0x0000abcd};
 
     DDASHit hit;
     DDASHitUnpacker unpacker;
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted with energy sums and no QDC",
-          uint64_t(0x00a00a0040302010), hit.getExternalTimestamp());
+          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
   }
 
   /**
@@ -432,14 +434,14 @@ public:
     std::vector<uint32_t> data = {
         0x0000000e, 0x0c0c0064, 0x001ce000, 0x139f2709, 0x28170000, 0x00007fff,
         0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005, 0x00000006,
-        0x00000007, 0x00000008, 0x40302010, 0x00a00a00};
+        0x00000007, 0x00000008, 0x76543210, 0x0000abcd};
 
     DDASHit hit;
     DDASHitUnpacker unpacker;
     unpacker.unpack(data.data(), data.data() + data.size(), hit);
 
     EQMSG("Timestamp extracted with QDC and no energy sums",
-          uint64_t(0x00a00a0040302010), hit.getExternalTimestamp());
+          uint64_t(0x0000abcd76543210), hit.getExternalTimestamp());
   }
 
   //_______________________________________________________________________
@@ -448,7 +450,8 @@ public:
 
   /** @brief Check the module revision value is correctly parsed for Rev. H. */
   void revision_revH() {
-    EQMSG("Rev. H extract revision", uint16_t(17), hitRevH.getHardwareRevision());
+    EQMSG("Rev. H extract revision", uint16_t(17),
+          hitRevH.getHardwareRevision());
   }
 
   /** @brief Check the crate ID value is correctly parsed for Rev. H. */

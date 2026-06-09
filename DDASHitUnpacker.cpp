@@ -27,6 +27,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 
 #include "DDASBitMasks.h"
 
@@ -443,12 +444,15 @@ const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
  * where the conversion from clock tics to nanoseconds is known, for the
  * external timestamp no unit conversion is applied. Converting the timestamp
  * to proper units is left to the user.
+ * @note The lower 32 bits of the 48-bit timestamp are in in the 32-bit
+ * word pointed to by `data` and the upper 16 bits are in the lower 16 bits of
+ * the next 32-bit word.
  */
 const uint32_t *
 ddasfmt::DDASHitUnpacker::extractExternalTimestamp(const uint32_t *data,
                                                    DDASHit &hit) {
-  uint32_t low = *data++;  // Lower 32 bits.
-  uint32_t high = *data++; // Upper 16 bits in lower 16 bits of the word.
+  uint32_t low = *data++;
+  uint32_t high = *data++ & LOWER_16_BIT_MASK;
   uint64_t timestamp = (static_cast<uint64_t>(high) << 32) | low;
   hit.setExternalTimestamp(timestamp);
 
