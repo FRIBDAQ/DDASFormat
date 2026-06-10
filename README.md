@@ -64,7 +64,7 @@ include(ExternalProject)
 ExternalProject_Add(
     DDASFormat
     GIT_REPOSITORY <repository-url>
-    GIT_TAG master
+    GIT_TAG main
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ddasformat
 )
