@@ -21,7 +21,7 @@ if (BUILD_DOCS)
 
   # CMAKE_CURRENT_BINARY_DIR is @build@/docs, build docs there:
   
-  add_custom_target (docs ALL
+  add_custom_target (ddasfmt_docs ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating documentation with Doxygen"
