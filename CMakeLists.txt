@@ -5,7 +5,9 @@ project(DDASFormat VERSION 2.1.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
  
-# Detect if we're the top-level project or a subproject/ExternalProject:
+# Detect if we're the top-level project or a subproject/ExternalProject. Note this only
+# works with CMake builds invoked from the root CMakeLists.txt, not with direct calls to 
+# cmake in this directory as done, for example, in the NSCLDAQ install.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(DDASFMT_IS_TOPLEVEL ON)
 else()
