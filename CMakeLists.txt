@@ -18,23 +18,23 @@ option(DDASFMT_BUILD_DOCS  "Build DDASFormat documentation" ${DDASFMT_IS_TOPLEVE
 # -----------------------------------------------------------------------
 # Library target
 # -----------------------------------------------------------------------
-set(toplevel_sources
+set(ddasfmt_sources
   DDASHit.cpp
   DDASHitUnpacker.cpp
   )
  
-set(toplevel_headers
+set(ddasfmt_headers
   DDASBitMasks.h
   DDASHit.h
   DDASHitUnpacker.h
   )
  
-add_library(DDASFormat SHARED ${toplevel_sources})
+add_library(DDASFormat SHARED ${ddasfmt_sources})
  
 target_compile_options(DDASFormat PRIVATE -g -O2)
 target_link_options(DDASFormat PRIVATE -g)
  
-install(FILES ${toplevel_headers} DESTINATION include)
+install(FILES ${ddasfmt_headers} DESTINATION include)
 install(TARGETS DDASFormat DESTINATION lib)
  
 # -----------------------------------------------------------------------
