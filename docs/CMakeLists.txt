@@ -1,36 +1,26 @@
+cmake_minimum_required(VERSION 3.13)
 
-# Require Doxygen:
+# -----------------------------------------------------------------------
+# Documentation — requires Doxygen.
+# This file is only included when DDASFMT_BUILD_DOCS is ON, so a missing
+# Doxygen is always a hard error here rather than a silent skip.
+# -----------------------------------------------------------------------
 
-find_package (Doxygen)
-option (BUILD_DOCS "Create and install the HTML-based documentation (requires Doxygen)" ${DOXYGEN_FOUND})
+find_package(Doxygen REQUIRED)
 
-# If we have Doxygen, build the docs:
+set(doxyfile_in  ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+set(doxyfile     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-if (BUILD_DOCS)
-  if (NOT DOXYGEN_FOUND)
-    message (FATAL_ERROR "Doxygen is needed to build the documentation.")
-  endif()
+configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 
-  # Configure Doxygen.in in build directory and start the build:
-  
-  set (doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-  set (doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-  configure_file (${doxyfile_in} ${doxyfile} @ONLY)
-  
-  message ("Doxygen build started.")
+message(STATUS "Doxygen build started.")
 
-  # CMAKE_CURRENT_BINARY_DIR is @build@/docs, build docs there:
-  
-  add_custom_target (ddasfmt_docs ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating documentation with Doxygen"
-    VERBATIM
-    )  
+add_custom_target(ddasfmt_docs ALL
+  COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Generating DDASFormat documentation with Doxygen"
+  VERBATIM
+  )
 
-  # Install under @prefix@/share/
-
-  install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share)
-  install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/latex DESTINATION share)
-
-endif()
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html  DESTINATION share)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/latex DESTINATION share)
