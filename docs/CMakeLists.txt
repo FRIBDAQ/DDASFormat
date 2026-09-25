@@ -1,14 +1,10 @@
 
-# Require Doxygen:
-
-find_package (Doxygen)
-option (BUILD_DOCS "Create and install the HTML-based documentation (requires Doxygen)" ${DOXYGEN_FOUND})
-
 # If we have Doxygen, build the docs:
 
 if (BUILD_DOCS)
   if (NOT DOXYGEN_FOUND)
-    message (FATAL_ERROR "Doxygen is needed to build the documentation.")
+    message (WARNING "Doxygen is needed to build the documentation.")
+    return()
   endif()
 
   # Configure Doxygen.in in build directory and start the build:

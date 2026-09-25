@@ -53,7 +53,7 @@ ostream &operator<<(ostream &stream, const array<T, N> &vec) {
 
 class UnpackerTests : public CppUnit::TestFixture {
 private:
-  DDASHit hit100, hit250, hit500, hitRevH;
+  DDASHit hit100, hit250, hit500, hitRevH, hitBadMSPS;
   std::vector<uint32_t> data;
 
 public:
@@ -107,6 +107,13 @@ public:
   CPPUNIT_TEST(headerLength_RevH);
   CPPUNIT_TEST(eventLength_RevH);
   CPPUNIT_TEST(finishCode_RevH);
+
+  CPPUNIT_TEST(emptyBuffer);
+  CPPUNIT_TEST(badMSPS);
+  CPPUNIT_TEST(wrongEnergySumSize1);
+  CPPUNIT_TEST(wrongEnergySumSize2);
+  CPPUNIT_TEST(wrongQDCSumSize1);
+  CPPUNIT_TEST(wrongQDCSumSize2);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -485,6 +492,46 @@ public:
   void finishCode_RevH() {
     EQMSG("Rev. H extract finish code", uint32_t(0), hitRevH.getFinishCode());
   };
+
+  //_______________________________________________________________________
+  // Test failures which throw exceptions:
+  //
+
+  void emptyBuffer() {
+    DDASHit hit;
+    DDASHitUnpacker u;
+    uint32_t d = 0;
+    EXCEPTION(u.unpack(&d, &d, hit), std::runtime_error);
+  }
+
+  void badMSPS() {
+    auto bad = data;
+    bad[1] = 0x0c0c007b; // Module MSPS = 123
+    DDASHit hit;
+    DDASHitUnpacker u;
+    EXCEPTION(u.unpack(bad.data(), bad.data() + bad.size(), hit),
+              std::runtime_error);
+  }
+
+  void wrongEnergySumSize1() {
+    DDASHit hit;
+    EXCEPTION(hit.setEnergySums({1, 2, 3}), std::runtime_error);
+  }
+
+  void wrongEnergySumSize2() {
+    DDASHit hit;
+    EXCEPTION(hit.setEnergySums({1, 2, 3, 4, 5}), std::runtime_error);
+  }
+
+  void wrongQDCSumSize1() {
+    DDASHit hit;
+    EXCEPTION(hit.setQDCSums({1, 2, 3, 4, 5, 6, 7}), std::runtime_error);
+  }
+
+  void wrongQDCSumSize2() {
+    DDASHit hit;
+    EXCEPTION(hit.setQDCSums({1, 2, 3, 4, 5, 6, 7, 8, 9}), std::runtime_error);
+  }
 };
 
 // Register it with the test factory:

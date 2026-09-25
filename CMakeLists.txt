@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(DDASFormat VERSION 1.1.003)
+project(DDASFormat VERSION 2.1.002)
 
-option(BUILD_DOCS "Build documentation" ON)
+find_package(Doxygen)
+option(BUILD_DOCS "Build documentation (requires Doxygen)" ${DOXYGEN_FOUND})
 
 # Specify the C++ standard:
 
