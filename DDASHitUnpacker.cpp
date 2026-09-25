@@ -444,7 +444,7 @@ const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
  * where the conversion from clock tics to nanoseconds is known, for the
  * external timestamp no unit conversion is applied. Converting the timestamp
  * to proper units is left to the user.
- * @note The lower 32 bits of the 48-bit timestamp are in in the 32-bit
+ * @note The lower 32 bits of the 48-bit timestamp are in the 32-bit
  * word pointed to by `data` and the upper 16 bits are in the lower 16 bits of
  * the next 32-bit word.
  */

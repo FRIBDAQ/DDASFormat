@@ -269,7 +269,7 @@ public:
     EQMSG("250 MSPS extract module MSPS", uint32_t(250), hit250.getModMSPS());
   }
 
-  /** @brief Read revision from module idntifier word for 250 MSPS. */
+  /** @brief Read revision from module identifier word for 250 MSPS. */
   void revision_250() {
     EQMSG("250 MSPS extract hardware revision", uint16_t(15),
           hit250.getHardwareRevision());

@@ -68,7 +68,7 @@ public:
    * @brief Unpack data into a DDASHit.
    * @param beg Pointer to the first word of the hit body.
    * @param sentinel Pointer to the first word after the end of the body.
-   * @throw Any exceptions thrown but the unpacking functions called by this
+   * @throw Any exceptions thrown by the unpacking functions called by this
    * function (e.g. `const uint32_t *unpack()`, `parseBodySize()`,
    * `parseHeaderWord0()`, etc.) will be propagated.
    * @return Tuple of (DDASHit, nextWord).

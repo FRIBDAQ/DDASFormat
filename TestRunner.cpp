@@ -31,15 +31,15 @@ int main(int argc, char **argv) {
 
   runner.addTest(registry.makeTest());
 
-  bool wasSucessful;
+  bool wasSuccessful;
   try {
-    wasSucessful = runner.run("", false);
+    wasSuccessful = runner.run("", false);
   } catch (string &rFailure) {
     cerr << "Caught a string exception from test suites: \n";
     cerr << rFailure << endl;
-    wasSucessful = false;
+    wasSuccessful = false;
   }
-  return !wasSucessful;
+  return !wasSuccessful;
 }
 
 namespace DAQ {

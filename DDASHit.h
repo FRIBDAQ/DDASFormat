@@ -112,7 +112,7 @@ public:
   /**
    * @brief Destructor.
    * @details
-   * The destrutor is virtual to ensure proper destruction of
+   * The destructor is virtual to ensure proper destruction of
    * objects derived from DDASHit.
    */
   virtual ~DDASHit(){};
@@ -160,8 +160,8 @@ public:
    * Latching of the coarse timestamp depends on whether or not
    * the CFD is enabled, and, if enabled, whether the CFD algorithm
    * succeeds or not:
-   * - If the CFD is enabled and a vaild CFD exists, the coarse
-   *   timestamp is latched to the trace sample immidiately prior
+   * - If the CFD is enabled and a valid CFD exists, the coarse
+   *   timestamp is latched to the trace sample immediately prior
    *   to the zero-crossing point.
    * - If the CFD is enabled and fails, the coarse timestamp is
    *   latched to the leading-edge trigger point.
@@ -201,7 +201,7 @@ public:
    * @return The number of 32-bit words in the event.
    * @details
    * Note that this only really makes sense to be used if the object
-   * was filled with data using UnpackChannelData().
+   * was filled with data using `unpack()`.
    */
   uint32_t getChannelLength() const { return m_channelLength; }
   /**
@@ -231,7 +231,7 @@ public:
   uint32_t getModMSPS() const { return m_modMSPS; }
   /**
    * @brief Retrieve the hardware revision.
-   * @return int  Module hardware revision number.
+   * @return The module hardware revision number.
    */
   uint16_t getHardwareRevision() const { return m_hdwrRevision; }
   /**
@@ -245,7 +245,7 @@ public:
    */
   uint32_t getCFDTrigSource() const { return m_cfdTrigSourceBit; }
   /**
-   * @brief Retreive failure bit from CFD data.
+   * @brief Retrieve failure bit from CFD data.
    * @return The CFD fail bit.
    * @details
    * The fail bit == 1 if the CFD fails, 0 otherwise.
