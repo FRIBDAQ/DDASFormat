@@ -85,7 +85,6 @@ private:
   uint32_t m_timeLow;             //!< Bits 0-31 of timestamp.
   uint32_t m_timeCFD;             //!< Raw cfd time.
   uint32_t m_energy;              //!< Energy of event.
-  uint32_t m_finishCode;          //!< Indicates whether pile-up occurred.
   uint32_t m_channelLength;       //!< Number of 32-bit words of raw data.
   uint32_t m_channelHeaderLength; //!< Length of header.
   uint32_t m_chanID;              //!< Channel index.
@@ -97,6 +96,7 @@ private:
   uint32_t m_modMSPS;             //!< Sampling rate of the module (MSPS).
   uint16_t m_hdwrRevision;        //!< Hardware revision.
   uint16_t m_adcResolution;       //!< ADC resolution.
+  bool m_finishCode;              //!< Indicates whether pile-up occurred.
   bool m_adcOverflowUnderflow;    //!< =1 if over- or under-flow.
 
   // Storage for extra data which may be present in a hit:
@@ -115,7 +115,7 @@ public:
    * The destrutor is virtual to ensure proper destruction of
    * objects derived from DDASHit.
    */
-  virtual ~DDASHit() {};
+  virtual ~DDASHit(){};
   /**
    * @brief Resets the state of all member data to that of
    * initialization
@@ -195,13 +195,6 @@ public:
    * @return The raw CFD time value from the data word.
    */
   uint32_t getTimeCFD() const { return m_timeCFD; }
-  /**
-   * @brief Retrieve finish code
-   * @return The finish code.
-   * @details
-   * The finish code will be set to 1 if pileup was detected.
-   */
-  uint32_t getFinishCode() const { return m_finishCode; }
   /**
    * @brief Retrieve number of 32-bit words that were in original
    * data packet.
@@ -299,6 +292,13 @@ public:
    */
   uint64_t getExternalTimestamp() const { return m_externalTimestamp; }
   /**
+   * @brief Retrieve finish code
+   * @return The finish code.
+   * @details
+   * The finish code will be set to 1 if pileup was detected.
+   */
+  bool getFinishCode() const { return m_finishCode; }
+  /**
    * @brief Retrieve the ADC overflow/underflow status
    * @return bool
    * @retval true  If the ADC over- or underflows.
@@ -335,11 +335,6 @@ public:
   void setChannelLength(uint32_t channelLength) {
     m_channelLength = channelLength;
   }
-  /**
-   * @brief Set the finish code.
-   * @param finishCode Finish code for this hit.
-   */
-  void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
   /**
    * @brief Set the coarse timestamp (timestamp without CFD correction).
    * @param time The coarse timestamp for this hit.
@@ -470,6 +465,11 @@ public:
    *   to DDAS. in clock ticks.
    */
   void setExternalTimestamp(uint64_t value) { m_externalTimestamp = value; }
+  /**
+   * @brief Set the finish code.
+   * @param finishCode Finish code for this hit.
+   */
+  void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
   /**
    * @brief Set ADC over- or under-flow state.
    * @param state The ADC under-/overflow state. True if the ADC

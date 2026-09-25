@@ -200,7 +200,7 @@ public:
 
   /** @brief Check the module finish code. */
   void finishCode_100() {
-    EQMSG("100 MSPS extract finish code", uint32_t(0), hit100.getFinishCode());
+    EQMSG("100 MSPS extract finish code", false, hit100.getFinishCode());
   }
 
   /** @brief Check the module MSPS can be read. */
@@ -490,7 +490,7 @@ public:
 
   /** @brief Check the finish code value is correctly parsed for Rev. H. */
   void finishCode_RevH() {
-    EQMSG("Rev. H extract finish code", uint32_t(0), hitRevH.getFinishCode());
+    EQMSG("Rev. H extract finish code", false, hitRevH.getFinishCode());
   };
 
   //_______________________________________________________________________
