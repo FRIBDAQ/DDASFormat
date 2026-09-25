@@ -147,7 +147,7 @@ ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
                                  const uint32_t *sentinel) {
   DDASHit hit;
   const uint32_t *data = unpack(beg, sentinel, hit);
-  return std::make_tuple(hit, data);
+  return std::make_tuple(std::move(hit), data);
 }
 
 /**
