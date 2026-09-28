@@ -33,18 +33,8 @@ using namespace ddasfmt;
 namespace std {
 template <class T> ostream &operator<<(ostream &stream, const vector<T> &vec) {
   stream << "{ ";
-  for (auto &element : vec)
-    stream << element << " ";
-  stream << "}";
-
-  return stream;
-}
-
-template <class T, long unsigned int N>
-ostream &operator<<(ostream &stream, const array<T, N> &vec) {
-  stream << "{ ";
-  for (int i = 0; i < N; ++i)
-    stream << vec[i] << " ";
+  for (auto &ele : vec)
+    stream << ele << " ";
   stream << "}";
 
   return stream;
