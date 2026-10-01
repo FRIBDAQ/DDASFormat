@@ -15,8 +15,8 @@
              East Lansing, MI 48824-1321
 */
 
-#ifndef _ASSERTS_H
-#define _ASSERTS_H
+#ifndef ASSERTS_H
+#define ASSERTS_H
 
 #include <iostream>
 #include <string>
