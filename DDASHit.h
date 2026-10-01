@@ -342,8 +342,8 @@ public:
    * Latching of the coarse timestamp depends on whether or not the
    * CFD is enabled, and, if enabled, whether the CFD algorithm
    * succeeds or not:
-   * - If the CFD is enabled and a vaild CFD exists, the coarse
-   *   timestamp is latched to the trace sample immidiately prior
+   * - If the CFD is enabled and a valid CFD exists, the coarse
+   *   timestamp is latched to the trace sample immediately prior
    *   to the zero-crossing point.
    * - If the CFD is enabled and fails, the coarse timestamp is
    *   latched to the leading-edge trigger point.
@@ -364,7 +364,7 @@ public:
    * The 250 MSPS and 500 MSPS modules de-serialize data into an FPGA
    * which operates at some fraction of the ADC sampling rate. The CFD
    * trigger source bit specifies which fractional time offset from the
-   * FPGA clock tick the CFD zero-crossing occured. For 100 MSPS modules,
+   * FPGA clock tick the CFD zero-crossing occurred. For 100 MSPS modules,
    * the source bit is always equal to 0 (FPGA captures data also at
    * 100 MSPS).
    */

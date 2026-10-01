@@ -61,9 +61,8 @@ add_executable(unittests
   TestRunner.cpp
   unpackertests.cpp
   )
-  
-target_compile_options(unittests PRIVATE -Wall -Wextra)
 
+target_compile_options(unittests PRIVATE -Wall -Wextra)
 target_link_libraries(unittests DDASFormat cppunit)
 
 add_test(NAME DDASHitTests COMMAND unittests)

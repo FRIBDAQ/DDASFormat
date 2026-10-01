@@ -312,7 +312,7 @@ public:
     EQMSG("500 MSPS extract module MSPS", uint32_t(500), hit500.getModMSPS());
   }
 
-  /** @brief Read revision from module idntifier word for 500 MSPS. */
+  /** @brief Read revision from module identifier word for 500 MSPS. */
   void revision_500() {
     EQMSG("500 MSPS extract hardware revision", uint16_t(15),
           hit500.getHardwareRevision());
