@@ -27,6 +27,30 @@ cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/ddasformat
 cmake --build build
 cmake --install build
 ```
+
+### Build Options
+
+The following cache options control what is built. Pass them at configure time with `-D<OPTION>=<value>`:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `CMAKE_BUILD_TYPE` | `RelWithDebInfo` (`-O2 -g`) | Standard CMake build type. Set to `Debug`, `Release`, or `MinSizeRel` to override. Ignored by multi-config generators. |
+| `BUILD_DOCS` | `ON` when Doxygen is found **and** DDASFormat is the top-level project; `OFF` otherwise | Build and install the Doxygen HTML documentation (and LaTeX, if enabled in the Doxyfile). |
+| `DDASFORMAT_BUILD_TESTS` | `ON` when DDASFormat is the top-level project; `OFF` when built as a subproject | Build the CppUnit-based unit tests. Requires CppUnit. |
+
+When DDASFormat is built as a subproject (see [Using DDASFormat in Other CMake Projects](#using-ddasformat-in-other-cmake-projects)), the tests and documentation are off by default so that consumers are not required to provide CppUnit or Doxygen. Either can be forced on explicitly:
+
+```
+cmake -S . -B build -DDDASFORMAT_BUILD_TESTS=ON -DBUILD_DOCS=ON
+```
+
+or from a parent project, before pulling DDASFormat in:
+
+```
+set(DDASFORMAT_BUILD_TESTS ON)
+add_subdirectory(DDASFormat)
+```
+
 ### Running DDASFormat Unit Tests
 
 From the top-level directory, again assuming the build directory is called "build:"
