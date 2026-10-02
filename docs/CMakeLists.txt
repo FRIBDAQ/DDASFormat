@@ -1,5 +1,10 @@
+cmake_minimum_required(VERSION 3.13)
 
-# Require Doxygen:
+# -----------------------------------------------------------------------
+# Documentation — requires Doxygen.
+# This file is only included when DDASFMT_BUILD_DOCS is ON, so a missing
+# Doxygen is always a hard error here rather than a silent skip.
+# -----------------------------------------------------------------------
 
 find_package (Doxygen)
 

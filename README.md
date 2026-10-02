@@ -52,11 +52,15 @@ or from a parent project, before pulling DDASFormat in:
 set(DDASFORMAT_BUILD_TESTS ON)
 add_subdirectory(DDASFormat)
 ```
+target_include_directories(my_application PRIVATE
+    ${CMAKE_BINARY_DIR}/ddasformat/include
+)
 
 ### Running DDASFormat Unit Tests
 
 Run the tests from inside the build directory:
 
+target_link_libraries(my_application PRIVATE DDASFormat)
 ```
 cd build
 ctest -VV

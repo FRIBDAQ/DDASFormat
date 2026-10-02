@@ -32,7 +32,6 @@ option(DDASFORMAT_BUILD_TESTS "Build unit tests (requires CppUnit)"
   ${PROJECT_IS_TOP_LEVEL})
 
 # Specify the C++ standard:
-
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -57,9 +56,11 @@ add_subdirectory(docs)
 set (toplevel_sources
   DDASHit.cpp DDASHitUnpacker.cpp
   )
-
-set (toplevel_headers
-  DDASBitMasks.h DDASHit.h DDASHitUnpacker.h
+ 
+set(ddasfmt_headers
+  DDASBitMasks.h
+  DDASHit.h
+  DDASHitUnpacker.h
   )
 
 add_library(DDASFormat SHARED ${toplevel_sources})
