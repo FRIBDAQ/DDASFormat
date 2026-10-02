@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -76,6 +77,19 @@ void ddasfmt::DDASHit::Reset() {
   m_energySums.clear();
   m_qdcSums.clear();
   m_trace.clear();
+}
+
+uint32_t ddasfmt::DDASHit::getCFDTrigSource() const {
+  static bool warned = false;
+  if (!warned) {
+    std::cerr
+        << "WARNING: DDASHit::getCFDTrigSource() will be deprecated no earlier "
+           "than October 1, 2027. Use getCFDTrigSourceBit() instead."
+        << std::endl;
+    warned = true;
+  }
+
+  return getCFDTrigSourceBit();
 }
 
 void ddasfmt::DDASHit::setTimeHigh(uint32_t datum) {

@@ -24,7 +24,7 @@ using namespace std;
 
 // Boilerplate code for CPPUNIT tests:
 
-int main(int argc, char **argv) {
+int main() {
   CppUnit::TextUi::TestRunner runner; // Control tests.
   CppUnit::TestFactoryRegistry &registry(
       CppUnit::TestFactoryRegistry::getRegistry());

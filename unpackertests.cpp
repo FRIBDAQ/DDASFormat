@@ -229,7 +229,7 @@ public:
   /** @brief Get the CFD trigger source bit. */
   void cfdTrigSource_100() {
     EQMSG("100 MSPS compute CFD trig source bit", uint32_t(0),
-          hit100.getCFDTrigSource());
+          hit100.getCFDTrigSourceBit());
   }
 
   /** @brief Read the energy sums. */
@@ -300,7 +300,7 @@ public:
   /** @brief Read CFD trigger source from 250 MSPS module. */
   void cfdTrigSource_250() {
     EQMSG("250 MSPS compute CFD trig source bit", uint32_t(1),
-          hit250.getCFDTrigSource());
+          hit250.getCFDTrigSourceBit());
   }
 
   //_______________________________________________________________________
@@ -343,7 +343,7 @@ public:
   /** @brief Read CFD trigger source from 500 MSPS module. */
   void cfdTrigSource_500() {
     EQMSG("500 MSPS compute CFD trig source bit", uint32_t(3),
-          hit500.getCFDTrigSource());
+          hit500.getCFDTrigSourceBit());
   }
 
   /**

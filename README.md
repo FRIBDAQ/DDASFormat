@@ -25,8 +25,10 @@ This project is built with CMake, which prefers out-of-tree builds. The CMake va
 ```
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/ddasformat
 cmake --build build
-cmake --install build
+cmake --build build --target install
 ```
+
+The commands above work with the minimum supported CMake (3.13). On CMake 3.15 or later, the final step can be written as `cmake --install build`.
 
 ### Build Options
 
@@ -38,7 +40,7 @@ The following cache options control what is built. Pass them at configure time w
 | `BUILD_DOCS` | `ON` when Doxygen is found **and** DDASFormat is the top-level project; `OFF` otherwise | Build and install the Doxygen HTML documentation (and LaTeX, if enabled in the Doxyfile). |
 | `DDASFORMAT_BUILD_TESTS` | `ON` when DDASFormat is the top-level project; `OFF` when built as a subproject | Build the CppUnit-based unit tests. Requires CppUnit. |
 
-When DDASFormat is built as a subproject (see [Using DDASFormat in Other CMake Projects](#using-ddasformat-in-other-cmake-projects)), the tests and documentation are off by default so that consumers are not required to provide CppUnit or Doxygen. Either can be forced on explicitly:
+When DDASFormat is built as a subproject (see the "Using DDASFormat in Other CMake Projects" section below), the tests and documentation are off by default so that consumers are not required to provide CppUnit or Doxygen. Either can be forced on explicitly:
 
 ```
 cmake -S . -B build -DDDASFORMAT_BUILD_TESTS=ON -DBUILD_DOCS=ON
@@ -53,11 +55,14 @@ add_subdirectory(DDASFormat)
 
 ### Running DDASFormat Unit Tests
 
-From the top-level directory, again assuming the build directory is called "build:"
+Run the tests from inside the build directory:
 
 ```
-ctest --test-dir build -VV
+cd build
+ctest -VV
 ```
+
+On CMake 3.20 or later, you can instead run `ctest --test-dir build -VV` from the top-level directory without changing into the build directory.
 
 ## Using DDASFormat in Other CMake Projects
 

@@ -242,8 +242,16 @@ public:
   /**
    * @brief Retrieve trigger source bit from CFD data.
    * @return The CFD trigger source bit.
+   * @note (ASC 10/1/26): This method is deprecated. Use getCFDTrigSourceBit()
+   * instead.
    */
-  uint32_t getCFDTrigSource() const { return m_cfdTrigSourceBit; }
+  __attribute__((deprecated("Use getCFDTrigSourceBit() instead."))) uint32_t
+  getCFDTrigSource() const;
+  /**
+   * @brief Retrieve trigger source bit from CFD data.
+   * @return The CFD trigger source bit.
+   */
+  uint32_t getCFDTrigSourceBit() const { return m_cfdTrigSourceBit; }
   /**
    * @brief Retrieve failure bit from CFD data.
    * @return The CFD fail bit.
