@@ -15,8 +15,8 @@
              East Lansing, MI 48824-1321
 */
 
-#ifndef __ASSERTS_H
-#define __ASSERTS_H
+#ifndef ASSERTS_H
+#define ASSERTS_H
 
 #include <iostream>
 #include <string>
@@ -36,7 +36,7 @@
     bool ok = false;                                                           \
     try {                                                                      \
       operation;                                                               \
-    } catch (type e) {                                                         \
+    } catch (const type &e) {                                                  \
       ok = true;                                                               \
     }                                                                          \
     ASSERT(ok);                                                                \

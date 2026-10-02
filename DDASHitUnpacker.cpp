@@ -62,24 +62,24 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
   // Finished unpacking the minimum set of data:
 
   uint32_t channelHeaderLength = hit.getChannelHeaderLength();
-  uint32_t channellength = hit.getChannelLength();
-  size_t tracelength = hit.getTraceLength();
+  uint32_t channelLength = hit.getChannelLength();
+  size_t traceLength = hit.getTraceLength();
 
   // We may have more data to unpack. Note that individual trace words are
-  // uint16_t, so for tracelength in units of trace samples, we need to divide
+  // uint16_t, so for traceLength in units of trace samples, we need to divide
   // by sizeof(uint16_t) to get the number of 32-bit words in the trace data.
   // The total number of 32-bit words in the event should be equal to the
   // channel header length plus the number of 32-bit words in the trace data. If
   // this is not the case, then there is a data corruption issue and we throw an
   // error.
 
-  if (channellength != (channelHeaderLength + tracelength / sizeof(uint16_t))) {
+  if (channelLength != (channelHeaderLength + traceLength / sizeof(uint16_t))) {
     std::stringstream errmsg;
     errmsg << "ERROR: Data corruption: ";
     errmsg << "Inconsistent data lengths found in header ";
-    errmsg << "\nChannel length = " << std::setw(8) << channellength;
+    errmsg << "\nChannel length = " << std::setw(8) << channelLength;
     errmsg << "\nHeader length  = " << std::setw(8) << channelHeaderLength;
-    errmsg << "\nTrace length   = " << std::setw(8) << tracelength;
+    errmsg << "\nTrace length   = " << std::setw(8) << traceLength;
     throw std::runtime_error(errmsg.str());
   }
 
@@ -124,7 +124,7 @@ const uint32_t *ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
 
   // If trace length is non zero, unpack the trace data:
 
-  if (tracelength != 0) {
+  if (traceLength != 0) {
     data = parseTraceData(hit, data);
   }
 
@@ -147,7 +147,7 @@ ddasfmt::DDASHitUnpacker::unpack(const uint32_t *beg,
                                  const uint32_t *sentinel) {
   DDASHit hit;
   const uint32_t *data = unpack(beg, sentinel, hit);
-  return std::make_tuple(hit, data);
+  return std::make_tuple(std::move(hit), data);
 }
 
 /**
@@ -249,8 +249,8 @@ ddasfmt::DDASHitUnpacker::parseHeaderWords1And2(DDASHit &hit,
   hit.setTimeLow(timeLow);
   hit.setTimeHigh(timeHigh);
 
-  uint32_t adcFrequency = hit.getModMSPS();
-  uint64_t coarseTime = computeCoarseTime(adcFrequency, timeLow, timeHigh);
+  uint32_t modMSPS = hit.getModMSPS();
+  uint64_t coarseTime = computeCoarseTime(modMSPS, timeLow, timeHigh);
   double cfdCorrection =
       parseAndComputeCFD(hit, word2); // Also sets CFD bits in hit.
 
@@ -288,11 +288,11 @@ ddasfmt::DDASHitUnpacker::parseHeaderWord3(DDASHit &hit, const uint32_t *data) {
  */
 const uint32_t *ddasfmt::DDASHitUnpacker::parseTraceData(DDASHit &hit,
                                                          const uint32_t *data) {
-  size_t tracelength = hit.getTraceLength(); // Samples.
+  size_t traceLength = hit.getTraceLength(); // Samples.
   size_t tracewords =
-      tracelength / sizeof(uint16_t); // 32-bit words of trace data.
+      traceLength / sizeof(uint16_t); // 32-bit words of trace data.
   std::vector<uint16_t> trace;
-  trace.reserve(tracelength);
+  trace.reserve(traceLength);
   for (size_t i = 0; i < tracewords; i++) {
     uint32_t datum = *data++;
     trace.push_back(datum & LOWER_16_BIT_MASK);
@@ -310,25 +310,25 @@ const uint32_t *ddasfmt::DDASHitUnpacker::parseTraceData(DDASHit &hit,
  * `parseModuleInfo()`.
  */
 std::tuple<double, uint32_t, uint32_t, uint32_t>
-ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data) {
+ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t modMSPS, uint32_t data) {
 
   double correction;
   uint32_t cfdTrigSource, cfdFailBit, timeCFD;
 
   // Check on the module MSPS and pick the correct CFD unpacking algorithm
-  if (ModMSPS == 100) {
+  if (modMSPS == 100) {
     // 100 MSPS modules don't have trigger source bits
     cfdFailBit = ((data & BIT_31_MASK) >> 31);
     cfdTrigSource = 0;
     timeCFD = ((data & BIT_30_TO_16_MASK) >> 16);
     correction = (timeCFD / 32768.0) * 10.0; // 32768 = 2^15
-  } else if (ModMSPS == 250) {
+  } else if (modMSPS == 250) {
     // CFD fail bit in bit 31
     cfdFailBit = ((data & BIT_31_MASK) >> 31);
     cfdTrigSource = ((data & BIT_30_MASK) >> 30);
     timeCFD = ((data & BIT_29_TO_16_MASK) >> 16);
     correction = (timeCFD / 16384.0 - cfdTrigSource) * 4.0;
-  } else if (ModMSPS == 500) {
+  } else if (modMSPS == 500) {
     // No fail bit in 500 MSPS modules
     cfdTrigSource = ((data & BIT_31_TO_29_MASK) >> 29);
     timeCFD = ((data & BIT_28_TO_16_MASK) >> 16);
@@ -337,7 +337,7 @@ ddasfmt::DDASHitUnpacker::parseAndComputeCFD(uint32_t ModMSPS, uint32_t data) {
   } else {
     throw std::runtime_error("DDASHitUnpacker::parseAndComputeCFD(): Invalid "
                              "module ADC frequency: " +
-                             std::to_string(ModMSPS) +
+                             std::to_string(modMSPS) +
                              " MSPS. Expected 100, 250, or 500 MSPS.");
   }
 
@@ -385,7 +385,7 @@ double ddasfmt::DDASHitUnpacker::parseAndComputeCFD(DDASHit &hit,
  * \f[\text{time} = 10\times((\text{timeHigh} << 32)
  * + \text{timeLow})\f]
  */
-uint64_t ddasfmt::DDASHitUnpacker::computeCoarseTime(uint32_t adcFrequency,
+uint64_t ddasfmt::DDASHitUnpacker::computeCoarseTime(uint32_t modMSPS,
                                                      uint32_t timeLow,
                                                      uint32_t timeHigh) {
   uint64_t timestamp = (static_cast<uint64_t>(timeHigh) << 32) | timeLow;
@@ -393,14 +393,14 @@ uint64_t ddasfmt::DDASHitUnpacker::computeCoarseTime(uint32_t adcFrequency,
   // Conversion to units of real time depends on module type:
 
   uint64_t toNanoseconds;
-  if (adcFrequency == 100 || adcFrequency == 500) {
+  if (modMSPS == 100 || modMSPS == 500) {
     toNanoseconds = 10;
-  } else if (adcFrequency == 250) {
+  } else if (modMSPS == 250) {
     toNanoseconds = 8;
   } else {
     throw std::runtime_error("DDASHitUnpacker::computeCoarseTime(): Invalid "
                              "module ADC frequency: " +
-                             std::to_string(adcFrequency) +
+                             std::to_string(modMSPS) +
                              " MSPS. Expected 100, 250, or 500 MSPS.");
   }
 
@@ -444,7 +444,7 @@ const uint32_t *ddasfmt::DDASHitUnpacker::extractQDC(const uint32_t *data,
  * where the conversion from clock tics to nanoseconds is known, for the
  * external timestamp no unit conversion is applied. Converting the timestamp
  * to proper units is left to the user.
- * @note The lower 32 bits of the 48-bit timestamp are in in the 32-bit
+ * @note The lower 32 bits of the 48-bit timestamp are in the 32-bit
  * word pointed to by `data` and the upper 16 bits are in the lower 16 bits of
  * the next 32-bit word.
  */

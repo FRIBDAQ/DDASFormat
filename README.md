@@ -25,15 +25,48 @@ This project is built with CMake, which prefers out-of-tree builds. The CMake va
 ```
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/ddasformat
 cmake --build build
-cmake --install build
+cmake --build build --target install
 ```
+
+The commands above work with the minimum supported CMake (3.13). On CMake 3.15 or later, the final step can be written as `cmake --install build`.
+
+### Build Options
+
+The following cache options control what is built. Pass them at configure time with `-D<OPTION>=<value>`:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `CMAKE_BUILD_TYPE` | `RelWithDebInfo` (`-O2 -g`) | Standard CMake build type. Set to `Debug`, `Release`, or `MinSizeRel` to override. Ignored by multi-config generators. |
+| `BUILD_DOCS` | `ON` when Doxygen is found **and** DDASFormat is the top-level project; `OFF` otherwise | Build and install the Doxygen HTML documentation (and LaTeX, if enabled in the Doxyfile). |
+| `DDASFORMAT_BUILD_TESTS` | `ON` when DDASFormat is the top-level project; `OFF` when built as a subproject | Build the CppUnit-based unit tests. Requires CppUnit. |
+
+When DDASFormat is built as a subproject (see the "Using DDASFormat in Other CMake Projects" section below), the tests and documentation are off by default so that consumers are not required to provide CppUnit or Doxygen. Either can be forced on explicitly:
+
+```
+cmake -S . -B build -DDDASFORMAT_BUILD_TESTS=ON -DBUILD_DOCS=ON
+```
+
+or from a parent project, before pulling DDASFormat in:
+
+```
+set(DDASFORMAT_BUILD_TESTS ON)
+add_subdirectory(DDASFormat)
+```
+target_include_directories(my_application PRIVATE
+    ${CMAKE_BINARY_DIR}/ddasformat/include
+)
+
 ### Running DDASFormat Unit Tests
 
-From the top-level directory, again assuming the build directory is called "build:"
+Run the tests from inside the build directory:
 
+target_link_libraries(my_application PRIVATE DDASFormat)
 ```
-ctest --test-dir build -VV
+cd build
+ctest -VV
 ```
+
+On CMake 3.20 or later, you can instead run `ctest --test-dir build -VV` from the top-level directory without changing into the build directory.
 
 ## Using DDASFormat in Other CMake Projects
 

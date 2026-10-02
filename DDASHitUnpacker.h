@@ -68,7 +68,7 @@ public:
    * @brief Unpack data into a DDASHit.
    * @param beg Pointer to the first word of the hit body.
    * @param sentinel Pointer to the first word after the end of the body.
-   * @throw Any exceptions thrown but the unpacking functions called by this
+   * @throw Any exceptions thrown by the unpacking functions called by this
    * function (e.g. `const uint32_t *unpack()`, `parseBodySize()`,
    * `parseHeaderWord0()`, etc.) will be propagated.
    * @return Tuple of (DDASHit, nextWord).
@@ -138,33 +138,33 @@ protected:
   /**
    * @brief Determine the CFD correction to the leading-edge time in
    * nanoseconds from the CFD word.
-   * @param ModMSPS The module ADC frequency in MSPS.
+   * @param modMSPS The module ADC frequency in MSPS.
    * @param data The 32-bit data word encoding the CFD information.
-   * @throw std::runtime_error If the value of ModMSPS is not 100, 250, or 500.
+   * @throw std::runtime_error If the value of modMSPS is not 100, 250, or 500.
    * @return Tuple of (CFD correction in nanoseconds, value of the CFD encoded
    * in the data, CFD trigger source bit, CFD fail bit).
    */
   std::tuple<double, uint32_t, uint32_t, uint32_t>
-  parseAndComputeCFD(uint32_t ModMSPS, uint32_t data);
+  parseAndComputeCFD(uint32_t modMSPS, uint32_t data);
   /**
    * @brief Determine the CFD correction to the leading-edge time in nanoseconds
    * from the CFD word.
    * @param hit References the DDASHit we are unpacking.
    * @param data The 32-bit data word encoding the CFD information.
-   * @throw std::runtime_error If the value of ModMSPS is not 100, 250, or 500.
+   * @throw std::runtime_error If the value of modMSPS is not 100, 250, or 500.
    * @return The CFD correction in nanoseconds.
    */
   double parseAndComputeCFD(DDASHit &hit, uint32_t data);
   /**
    * @brief Compute time in nanoseconds from raw data (no CFD correction).
-   * @param adcFrequency Module ADC frequency in MSPS.
+   * @param modMSPS Module ADC frequency in MSPS.
    * @param timeLow Data word containing the lower 32 bits of the 48-bit
    * timestamp.
    * @param timeHigh Data word containing the upper 16 bits of the 48-bit
    * timestamp.
    * @return The 48-bit coarse timestamp in nanoseconds.
    */
-  uint64_t computeCoarseTime(uint32_t adcFrequency, uint32_t timeLow,
+  uint64_t computeCoarseTime(uint32_t modMSPS, uint32_t timeLow,
                              uint32_t timeHigh);
   /**
    * @brief Unpack energy sums.

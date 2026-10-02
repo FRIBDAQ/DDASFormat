@@ -85,7 +85,6 @@ private:
   uint32_t m_timeLow;             //!< Bits 0-31 of timestamp.
   uint32_t m_timeCFD;             //!< Raw cfd time.
   uint32_t m_energy;              //!< Energy of event.
-  uint32_t m_finishCode;          //!< Indicates whether pile-up occurred.
   uint32_t m_channelLength;       //!< Number of 32-bit words of raw data.
   uint32_t m_channelHeaderLength; //!< Length of header.
   uint32_t m_chanID;              //!< Channel index.
@@ -97,6 +96,7 @@ private:
   uint32_t m_modMSPS;             //!< Sampling rate of the module (MSPS).
   uint16_t m_hdwrRevision;        //!< Hardware revision.
   uint16_t m_adcResolution;       //!< ADC resolution.
+  bool m_finishCode;              //!< Indicates whether pile-up occurred.
   bool m_adcOverflowUnderflow;    //!< =1 if over- or under-flow.
 
   // Storage for extra data which may be present in a hit:
@@ -112,10 +112,10 @@ public:
   /**
    * @brief Destructor.
    * @details
-   * The destrutor is virtual to ensure proper destruction of
+   * The destructor is virtual to ensure proper destruction of
    * objects derived from DDASHit.
    */
-  virtual ~DDASHit() {};
+  virtual ~DDASHit(){};
   /**
    * @brief Resets the state of all member data to that of
    * initialization
@@ -160,8 +160,8 @@ public:
    * Latching of the coarse timestamp depends on whether or not
    * the CFD is enabled, and, if enabled, whether the CFD algorithm
    * succeeds or not:
-   * - If the CFD is enabled and a vaild CFD exists, the coarse
-   *   timestamp is latched to the trace sample immidiately prior
+   * - If the CFD is enabled and a valid CFD exists, the coarse
+   *   timestamp is latched to the trace sample immediately prior
    *   to the zero-crossing point.
    * - If the CFD is enabled and fails, the coarse timestamp is
    *   latched to the leading-edge trigger point.
@@ -196,19 +196,12 @@ public:
    */
   uint32_t getTimeCFD() const { return m_timeCFD; }
   /**
-   * @brief Retrieve finish code
-   * @return The finish code.
-   * @details
-   * The finish code will be set to 1 if pileup was detected.
-   */
-  uint32_t getFinishCode() const { return m_finishCode; }
-  /**
    * @brief Retrieve number of 32-bit words that were in original
    * data packet.
    * @return The number of 32-bit words in the event.
    * @details
    * Note that this only really makes sense to be used if the object
-   * was filled with data using UnpackChannelData().
+   * was filled with data using `unpack()`.
    */
   uint32_t getChannelLength() const { return m_channelLength; }
   /**
@@ -238,7 +231,7 @@ public:
   uint32_t getModMSPS() const { return m_modMSPS; }
   /**
    * @brief Retrieve the hardware revision.
-   * @return int  Module hardware revision number.
+   * @return The module hardware revision number.
    */
   uint16_t getHardwareRevision() const { return m_hdwrRevision; }
   /**
@@ -249,10 +242,18 @@ public:
   /**
    * @brief Retrieve trigger source bit from CFD data.
    * @return The CFD trigger source bit.
+   * @note (ASC 10/1/26): This method is deprecated. Use getCFDTrigSourceBit()
+   * instead.
    */
-  uint32_t getCFDTrigSource() const { return m_cfdTrigSourceBit; }
+  __attribute__((deprecated("Use getCFDTrigSourceBit() instead."))) uint32_t
+  getCFDTrigSource() const;
   /**
-   * @brief Retreive failure bit from CFD data.
+   * @brief Retrieve trigger source bit from CFD data.
+   * @return The CFD trigger source bit.
+   */
+  uint32_t getCFDTrigSourceBit() const { return m_cfdTrigSourceBit; }
+  /**
+   * @brief Retrieve failure bit from CFD data.
    * @return The CFD fail bit.
    * @details
    * The fail bit == 1 if the CFD fails, 0 otherwise.
@@ -299,6 +300,13 @@ public:
    */
   uint64_t getExternalTimestamp() const { return m_externalTimestamp; }
   /**
+   * @brief Retrieve finish code
+   * @return The finish code.
+   * @details
+   * The finish code will be set to 1 if pileup was detected.
+   */
+  bool getFinishCode() const { return m_finishCode; }
+  /**
    * @brief Retrieve the ADC overflow/underflow status
    * @return bool
    * @retval true  If the ADC over- or underflows.
@@ -336,19 +344,14 @@ public:
     m_channelLength = channelLength;
   }
   /**
-   * @brief Set the finish code.
-   * @param finishCode Finish code for this hit.
-   */
-  void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
-  /**
    * @brief Set the coarse timestamp (timestamp without CFD correction).
    * @param time The coarse timestamp for this hit.
    * @details
    * Latching of the coarse timestamp depends on whether or not the
    * CFD is enabled, and, if enabled, whether the CFD algorithm
    * succeeds or not:
-   * - If the CFD is enabled and a vaild CFD exists, the coarse
-   *   timestamp is latched to the trace sample immidiately prior
+   * - If the CFD is enabled and a valid CFD exists, the coarse
+   *   timestamp is latched to the trace sample immediately prior
    *   to the zero-crossing point.
    * - If the CFD is enabled and fails, the coarse timestamp is
    *   latched to the leading-edge trigger point.
@@ -369,7 +372,7 @@ public:
    * The 250 MSPS and 500 MSPS modules de-serialize data into an FPGA
    * which operates at some fraction of the ADC sampling rate. The CFD
    * trigger source bit specifies which fractional time offset from the
-   * FPGA clock tick the CFD zero-crossing occured. For 100 MSPS modules,
+   * FPGA clock tick the CFD zero-crossing occurred. For 100 MSPS modules,
    * the source bit is always equal to 0 (FPGA captures data also at
    * 100 MSPS).
    */
@@ -470,6 +473,11 @@ public:
    *   to DDAS. in clock ticks.
    */
   void setExternalTimestamp(uint64_t value) { m_externalTimestamp = value; }
+  /**
+   * @brief Set the finish code.
+   * @param finishCode Finish code for this hit.
+   */
+  void setFinishCode(bool finishCode) { m_finishCode = finishCode; }
   /**
    * @brief Set ADC over- or under-flow state.
    * @param state The ADC under-/overflow state. True if the ADC

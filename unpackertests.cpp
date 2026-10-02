@@ -33,18 +33,8 @@ using namespace ddasfmt;
 namespace std {
 template <class T> ostream &operator<<(ostream &stream, const vector<T> &vec) {
   stream << "{ ";
-  for (auto &element : vec)
-    stream << element << " ";
-  stream << "}";
-
-  return stream;
-}
-
-template <class T, long unsigned int N>
-ostream &operator<<(ostream &stream, const array<T, N> &vec) {
-  stream << "{ ";
-  for (int i = 0; i < N; ++i)
-    stream << vec[i] << " ";
+  for (auto &ele : vec)
+    stream << ele << " ";
   stream << "}";
 
   return stream;
@@ -53,7 +43,7 @@ ostream &operator<<(ostream &stream, const array<T, N> &vec) {
 
 class UnpackerTests : public CppUnit::TestFixture {
 private:
-  DDASHit hit100, hit250, hit500, hitRevH;
+  DDASHit hit100, hit250, hit500, hitRevH, hitBadMSPS;
   std::vector<uint32_t> data;
 
 public:
@@ -107,6 +97,13 @@ public:
   CPPUNIT_TEST(headerLength_RevH);
   CPPUNIT_TEST(eventLength_RevH);
   CPPUNIT_TEST(finishCode_RevH);
+
+  CPPUNIT_TEST(emptyBuffer);
+  CPPUNIT_TEST(badMSPS);
+  CPPUNIT_TEST(wrongEnergySumSize1);
+  CPPUNIT_TEST(wrongEnergySumSize2);
+  CPPUNIT_TEST(wrongQDCSumSize1);
+  CPPUNIT_TEST(wrongQDCSumSize2);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -193,7 +190,7 @@ public:
 
   /** @brief Check the module finish code. */
   void finishCode_100() {
-    EQMSG("100 MSPS extract finish code", uint32_t(0), hit100.getFinishCode());
+    EQMSG("100 MSPS extract finish code", false, hit100.getFinishCode());
   }
 
   /** @brief Check the module MSPS can be read. */
@@ -232,7 +229,7 @@ public:
   /** @brief Get the CFD trigger source bit. */
   void cfdTrigSource_100() {
     EQMSG("100 MSPS compute CFD trig source bit", uint32_t(0),
-          hit100.getCFDTrigSource());
+          hit100.getCFDTrigSourceBit());
   }
 
   /** @brief Read the energy sums. */
@@ -262,7 +259,7 @@ public:
     EQMSG("250 MSPS extract module MSPS", uint32_t(250), hit250.getModMSPS());
   }
 
-  /** @brief Read revision from module idntifier word for 250 MSPS. */
+  /** @brief Read revision from module identifier word for 250 MSPS. */
   void revision_250() {
     EQMSG("250 MSPS extract hardware revision", uint16_t(15),
           hit250.getHardwareRevision());
@@ -303,7 +300,7 @@ public:
   /** @brief Read CFD trigger source from 250 MSPS module. */
   void cfdTrigSource_250() {
     EQMSG("250 MSPS compute CFD trig source bit", uint32_t(1),
-          hit250.getCFDTrigSource());
+          hit250.getCFDTrigSourceBit());
   }
 
   //_______________________________________________________________________
@@ -315,7 +312,7 @@ public:
     EQMSG("500 MSPS extract module MSPS", uint32_t(500), hit500.getModMSPS());
   }
 
-  /** @brief Read revision from module idntifier word for 500 MSPS. */
+  /** @brief Read revision from module identifier word for 500 MSPS. */
   void revision_500() {
     EQMSG("500 MSPS extract hardware revision", uint16_t(15),
           hit500.getHardwareRevision());
@@ -346,7 +343,7 @@ public:
   /** @brief Read CFD trigger source from 500 MSPS module. */
   void cfdTrigSource_500() {
     EQMSG("500 MSPS compute CFD trig source bit", uint32_t(3),
-          hit500.getCFDTrigSource());
+          hit500.getCFDTrigSourceBit());
   }
 
   /**
@@ -483,8 +480,48 @@ public:
 
   /** @brief Check the finish code value is correctly parsed for Rev. H. */
   void finishCode_RevH() {
-    EQMSG("Rev. H extract finish code", uint32_t(0), hitRevH.getFinishCode());
+    EQMSG("Rev. H extract finish code", false, hitRevH.getFinishCode());
   };
+
+  //_______________________________________________________________________
+  // Test failures which throw exceptions:
+  //
+
+  void emptyBuffer() {
+    DDASHit hit;
+    DDASHitUnpacker u;
+    uint32_t d = 0;
+    EXCEPTION(u.unpack(&d, &d, hit), std::runtime_error);
+  }
+
+  void badMSPS() {
+    auto bad = data;
+    bad[1] = 0x0c0c007b; // Module MSPS = 123
+    DDASHit hit;
+    DDASHitUnpacker u;
+    EXCEPTION(u.unpack(bad.data(), bad.data() + bad.size(), hit),
+              std::runtime_error);
+  }
+
+  void wrongEnergySumSize1() {
+    DDASHit hit;
+    EXCEPTION(hit.setEnergySums({1, 2, 3}), std::runtime_error);
+  }
+
+  void wrongEnergySumSize2() {
+    DDASHit hit;
+    EXCEPTION(hit.setEnergySums({1, 2, 3, 4, 5}), std::runtime_error);
+  }
+
+  void wrongQDCSumSize1() {
+    DDASHit hit;
+    EXCEPTION(hit.setQDCSums({1, 2, 3, 4, 5, 6, 7}), std::runtime_error);
+  }
+
+  void wrongQDCSumSize2() {
+    DDASHit hit;
+    EXCEPTION(hit.setQDCSums({1, 2, 3, 4, 5, 6, 7, 8, 9}), std::runtime_error);
+  }
 };
 
 // Register it with the test factory:

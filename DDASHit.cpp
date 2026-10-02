@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -39,12 +40,12 @@ using namespace ddasfmt;
  * All member data are zero-initialized.
  */
 ddasfmt::DDASHit::DDASHit()
-    : m_time(0), m_coarseTime(0), m_externalTimestamp(0), m_energy(0),
-      m_timeHigh(0), m_timeLow(0), m_timeCFD(0), m_finishCode(0),
-      m_channelLength(0), m_channelHeaderLength(0), m_chanID(0), m_slotID(0),
-      m_crateID(0), m_cfdTrigSourceBit(0), m_cfdFailBit(0), m_traceLength(0),
-      m_modMSPS(0), m_adcResolution(0), m_hdwrRevision(0),
-      m_adcOverflowUnderflow(false), m_energySums(), m_qdcSums(), m_trace() {}
+    : m_time(0), m_coarseTime(0), m_externalTimestamp(0), m_timeHigh(0),
+      m_timeLow(0), m_timeCFD(0), m_energy(0), m_channelLength(0),
+      m_channelHeaderLength(0), m_chanID(0), m_slotID(0), m_crateID(0),
+      m_cfdTrigSourceBit(0), m_cfdFailBit(0), m_traceLength(0), m_modMSPS(0),
+      m_hdwrRevision(0), m_adcResolution(0), m_finishCode(false),
+      m_adcOverflowUnderflow(false) {}
 
 /**
  * @details
@@ -76,6 +77,19 @@ void ddasfmt::DDASHit::Reset() {
   m_energySums.clear();
   m_qdcSums.clear();
   m_trace.clear();
+}
+
+uint32_t ddasfmt::DDASHit::getCFDTrigSource() const {
+  static bool warned = false;
+  if (!warned) {
+    std::cerr
+        << "WARNING: DDASHit::getCFDTrigSource() will be deprecated no earlier "
+           "than October 1, 2027. Use getCFDTrigSourceBit() instead."
+        << std::endl;
+    warned = true;
+  }
+
+  return getCFDTrigSourceBit();
 }
 
 void ddasfmt::DDASHit::setTimeHigh(uint32_t datum) {

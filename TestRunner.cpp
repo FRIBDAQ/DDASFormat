@@ -24,22 +24,22 @@ using namespace std;
 
 // Boilerplate code for CPPUNIT tests:
 
-int main(int argc, char **argv) {
+int main() {
   CppUnit::TextUi::TestRunner runner; // Control tests.
   CppUnit::TestFactoryRegistry &registry(
       CppUnit::TestFactoryRegistry::getRegistry());
 
   runner.addTest(registry.makeTest());
 
-  bool wasSucessful;
+  bool wasSuccessful;
   try {
-    wasSucessful = runner.run("", false);
+    wasSuccessful = runner.run("", false);
   } catch (string &rFailure) {
     cerr << "Caught a string exception from test suites: \n";
     cerr << rFailure << endl;
-    wasSucessful = false;
+    wasSuccessful = false;
   }
-  return !wasSucessful;
+  return !wasSuccessful;
 }
 
 namespace DAQ {
